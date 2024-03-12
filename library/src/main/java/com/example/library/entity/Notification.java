@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,5 +27,5 @@ public class Notification {
     private MainContent mainContentToNotification;
 
     @Column(name = "Sent")
-    private Timestamp sent;
+    private LocalDateTime sent;
 }

@@ -1,0 +1,70 @@
+<div id="body">
+  <div id = "Head">
+    <div id = "name">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "categori">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm tài khoản">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
+      <button style="color: #d35810; padding-left: 3.4rem" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+    </div>
+  </div>
+  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+  <div style="width: 16%; height: 100%; position: absolute; top: 3%; left: 22%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%;text-align: center">
+    <a><h3 style="color: red;" (click)="clickManageUser()">Quản lý tài khoản</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
+    <a><h3>Quản lý doanh thu</h3></a><br>
+  </div>
+  <div id = "nav">
+    <button style="color: #F78DA7; margin-bottom: 2%; float: right;" (click)="clickMore()">Xem thêm ></button>
+    <button style="color: #F78DA7; margin-bottom: 2%; float: left; z-index: 1" (click)="clickLast()">< Quay lại</button>
+    <table>
+      <tr>
+        <th>Tên Đăng Nhập</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>level</th>
+        <th>Trạng Thái</th>
+      </tr>
+      <tr *ngFor="let item of datasAccount, let i = index" (click)="clickAccount(item)">
+        <td>{{item.name}}</td>
+        <td>{{item.email}}</td>
+        <td>{{item.phone}}</td>
+        <td>{{item.address}}</td>
+        <td>{{item.level}}</td>
+        <td>{{item.status}}</td>
+      </tr>
+    </table>
+    <div id="button">
+      <button id="close" (click)="closeAccount()">Khóa các tài khoản</button>
+    </div>
+  </div>
+  <div id= "footer">
+    <table>
+      <tr style="color: black">
+        <th>Tên Đăng Nhập</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>level</th>
+        <th>Trạng Thái</th>
+      </tr>
+      <tr *ngIf="account">
+        <td><input [(ngModel)]="inputName" type="text" [placeholder]="account.name"></td>
+        <td><input [(ngModel)]="inputEmail" type="text" [placeholder]="account.email"></td>
+        <td><input [(ngModel)]="inputPhone" type="text" [placeholder]="account.phone"></td>
+        <td><input [(ngModel)]="inputAddress" type="text" [placeholder]="account.address"></td>
+        <td><input [(ngModel)]="inputLevel" type="text" [placeholder]="account.level"></td>
+        <td><input [(ngModel)]="inputStatus" type="text" [placeholder]="account.status"></td>
+        <div>
+          <button id="save" (click)="changeAccount()">Lưu</button>
+        </div>
+      </tr>
+    </table>
+  </div>
+</div>

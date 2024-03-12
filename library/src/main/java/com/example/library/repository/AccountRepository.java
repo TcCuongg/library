@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +78,23 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " where mainContent.content = :content")
     public List<Mess> findAllMessByContent(@Param("content") String content, Pageable pageable);
 
+    @Query("select new com.example.library.more.Mess(mainContent.type, mainContent.content, notification.sent, account.email)" +
+            " from Account account inner join account.notificationsFromAccount notification" +
+            " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
+            " notification.mainContentToNotification.id = mainContent.id where notification.sent >= :timeStart and notification.sent <= :timeEnd")
+    public List<Mess> findAllMessBySent(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
+                                        Pageable pageable);
+
     @Query("select account from Account account")
     public List<Account> findAllAccount();
+    @Query("select distinct account.status from Account account")
+    public List<String> findAllAccountStatus();
+    @Query("select account from Account account where account.timeCreate >= :timeStart and account.timeCreate <= :timeEnd and" +
+            " (:status is null or account.status = :status)")
+    public List<Account> selectAccount(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
+                                       @Param("status") String status, Pageable pageable);
 
+
+    public List<Account> findAllByEmail(String email);
+    public List<Account> findAllByPhone(Long phone);
 }

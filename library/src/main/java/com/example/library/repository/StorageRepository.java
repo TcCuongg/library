@@ -17,4 +17,6 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
 
     public List<Storage> findAllByLocation(String location, Pageable pageable);
     public List<Storage> findAllByPhone(Long phone, Pageable pageable);
+
+    public Storage findFirstById(Long id);
 }

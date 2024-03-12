@@ -1,0 +1,79 @@
+<div id="body">
+  <div id = "Head">
+    <div id = "name" [routerLink]="'/bookStore'">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "cate">
+      <h3 style="float: left; padding-left: 3%;">Tất cả thể loại</h3>
+      <img style="width: 1.5%; transform: rotate(90deg); margin: auto 4%;" alt="error" src="assets/icon/More.svg" (click)="clickMoreCategory()">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm sách">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="newListBook()">
+      <button (click)="clickCart()">| Giỏ hàng |</button>
+      <button (click)="clickLogin()" [ngStyle]="lastLogin1()">Đăng nhập</button>
+      <button style="color: #d35810; display: none" [ngStyle]="lastLogin2()" *ngIf="dataAccount"  (click)="clickUser()">{{dataAccount.name}}</button>
+    </div>
+  </div>
+  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+  <div id = "more" [ngStyle]="changeMore()">
+    <p></p><br>
+    <div *ngFor="let item of datasCategory" (click)="clickCategory(item); clickMoreCategory()">
+      <a><h3>{{item.name}}</h3></a><br>
+    </div>
+  </div>
+  <button style="color: #ED2874; position: absolute; top: 5%; right: 5%; display: none; width: 8rem; z-index: 1;" [ngStyle]="buy()" (click)="clickBuy()">Đơn mua ></button>
+  <div id = "nav">
+    <div class="listBook">
+      <div style="background-color: white" *ngFor="let item of datasBook" (click)="sendBookContent(item)">
+        <img src="{{item.image}}" alt="error">
+        <h3>{{item.title}}</h3><br>
+        <div style="transform: translateX(6%)">
+          <p style="color: #6e6464; text-decoration: line-through; float: left;">{{item.cost}}VND</p>
+          <p style="float: left; margin-left: 4%; padding: 0px 2%; background-color: #fcbcbc; color: red; border-radius: 1px">-{{item.sale}}%</p>
+          <p style="color: #DB1037;">{{(item.cost ?? 0) - ((item.cost ?? 0) * (item.sale ?? 0) / 100)}}VND</p>
+        </div>
+        <div>
+          <p style="margin-top: 6%; margin-bottom: 6%">Đã bán {{item.follow}}</p>
+        </div>
+      </div>
+    </div>
+    <button style="float: right; color: #ED2874; position: absolute; bottom: 4rem; right: 0%;" (click)="clickMore()"><p>Xem thêm ></p></button>
+    <button style="float: left; color: #ED2874; position: absolute; bottom: 4rem; left: 0%;" (click)="clickLast()"><p>< Quay lại</p></button>
+  </div>
+  <div id = "footer">
+    <h3>Chào mừng đến hiệu sách của chúng tôi</h3>
+  </div>
+  <div id="login" [ngStyle]="changeLogin()">
+    <form>
+      <img alt="error" src="assets/icon/close.svg" (click)="clickLogin()">
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 10px;">Chào mừng trở lại</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
+        <h3>Email đăng nhập</h3>
+        <input [(ngModel)]="inputValueEmail" type="text" name="userName" placeholder="Email đăng nhập"><br>
+        <h3>Mật khẩu</h3>
+        <input [(ngModel)]="inputValuePass" type="text" name="password" placeholder="Mật khẩu"><br>
+        <input style="width: 20%; float: right;" type="submit" value="Đăng nhập" (click)="clickLoginPost()"><br>
+        <p (click)="clickNewUser(); clickLogin()">Đăng ký tài khoản mới?</p>
+      </div>
+    </form>
+  </div>
+  <div id="newUser" [ngStyle]="changeNewUser()">
+    <form>
+      <img alt="error" src="assets/icon/close.svg" (click)="clickNewUser()">
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 10px;">Đăng ký tài khoản mới</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
+        <h3>Tên đăng nhập</h3>
+        <input [(ngModel)]="inputValueName" type="text" name="userName" placeholder="Tên đăng nhập"><br>
+        <h3>Email đăng nhập</h3>
+        <input [(ngModel)]="inputValueAddEmail" type="text" name="Email" placeholder="Email đăng nhập"><br>
+        <h3>SĐT liên hệ</h3>
+        <input [(ngModel)]="inputValuePhone" type="text" name="Phone" placeholder="SĐT liện hệ"><br>
+        <h3>Địa chỉ</h3>
+        <input [(ngModel)]="inputValueAddress" type="text" name="address" placeholder="Địa chỉ"><br>
+        <h3>Mật khẩu</h3>
+        <input [(ngModel)]="inputValueAddPass" type="text" name="password" placeholder="Mật khẩu"><br>
+        <input style="width: 20%; float: right;" type="submit" value="Đăng ký" (click)="clickAddUser();  clickNewUser(); clickLogin()"><br>
+      </div>
+    </form>
+  </div>
+</div>

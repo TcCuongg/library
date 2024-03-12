@@ -13,5 +13,7 @@ import java.util.List;
 @Repository
 public interface MainContentRepository extends JpaRepository<MainContent, Long> {
     public MainContent findFirstById(Long id);
+
+    public MainContent findFirstByOrderByIdDesc();
 }
 

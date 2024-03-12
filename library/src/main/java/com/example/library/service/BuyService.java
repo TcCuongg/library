@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 public class BuyService {
@@ -22,13 +23,23 @@ public class BuyService {
     private AccountRepository accountRepository;
 
     public Buy addNewBuy(Long bookStorageId, Long accountId, Long cost, String status){
-        Timestamp timestamp = Timestamp.from(Instant.now());
+        Account account = accountRepository.findFirstByCardNumber(accountId);
+        BookStorage bookStorage = bookStorageRepository.findFirstById(bookStorageId);
         Buy buy = new Buy();
         buy.setCost(cost);
-        buy.setAccountToBuy(accountRepository.findFirstByCardNumber(accountId));
+        buy.setAccountToBuy(account);
         buy.setStatus(status);
-        buy.setTime(timestamp);
-        buy.setBookStorageToBuy(bookStorageRepository.findFirstById(bookStorageId));
+        buy.setTime(LocalDateTime.now());
+        buy.setBookStorageToBuy(bookStorage);
+
+        account.getBuysFromAccount().add(buy);
+        account.setBuysFromAccount(account.getBuysFromAccount());
+        accountRepository.save(account);
+
+        bookStorage.getBuysFromBookStorage().add(buy);
+        bookStorage.setBuysFromBookStorage(bookStorage.getBuysFromBookStorage());
+        bookStorageRepository.save(bookStorage);
+
         return buyRepository.save(buy);
     }
 }

@@ -18,6 +18,8 @@ public class BookManage {
     private String category;
     private String author;
 
+    public BookManage(){}
+
     public BookManage(Long bookId, Long authorId, String title, Long cost, String content, String status,
                       int sale, String category, String author){
         this.bookId = bookId;

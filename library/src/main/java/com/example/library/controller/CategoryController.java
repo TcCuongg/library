@@ -26,6 +26,10 @@ public class CategoryController {
     public List<Category> getCategoryByTitle(@PathVariable String title, @PathVariable int count, @PathVariable int size){
         return categoryService.getCategoryByTitle(title, count, size);
     }
+    @GetMapping("/getAllCategoryName")
+    public List<String> getAllCategoryName(){
+        return categoryService.findAllCategoryName();
+    }
 
 
     @PutMapping("/updateCategorySale")

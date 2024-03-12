@@ -1,10 +1,13 @@
 package com.example.library.more;
 
+import com.example.library.RedisObject.BookMoreRedis;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Setter
 @Getter
@@ -22,11 +25,11 @@ public class BookMore {
     private int quantity;
     private int sale;
     private Long id;
-    private Timestamp importTime;
+    private LocalDateTime importTime;
     private String status;
     public BookMore(String title, String category, String author, String image, String content, Long bookId,
                     Long authorId, Long categoryId, Long cost, Long follow, int quantity, int sale, Long id,
-                    Timestamp importTime, String status){
+                    LocalDateTime importTime, String status){
         this.title = title;
         this.category = category;
         this.author = author;
@@ -42,5 +45,22 @@ public class BookMore {
         this.id = id;
         this.importTime = importTime;
         this.status = status;
+    }
+    public BookMore(BookMoreRedis bookMoreRedis){
+        this.title = bookMoreRedis.getTitle();
+        this.category = bookMoreRedis.getCategory();
+        this.author = bookMoreRedis.getAuthor();
+        this.image = bookMoreRedis.getImage();
+        this.content = bookMoreRedis.getContent();
+        this.bookId = bookMoreRedis.getBookId();
+        this.authorId = bookMoreRedis.getAuthorId();
+        this.categoryId = bookMoreRedis.getCategoryId();
+        this.cost = bookMoreRedis.getCost();
+        this.follow = bookMoreRedis.getFollow();
+        this.quantity = bookMoreRedis.getQuantity();
+        this.sale = bookMoreRedis.getSale();
+        this.id = bookMoreRedis.getId();
+        this.importTime = LocalDateTime.parse(bookMoreRedis.getImportTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        this.status = bookMoreRedis.getStatus();
     }
 }

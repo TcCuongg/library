@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class Author {
     private String name;
 
     @Column(name = "Date")
-    private Timestamp date;
+    private LocalDateTime date;
 
     @Column(name = "Address")
     private String address;

@@ -21,6 +21,8 @@ public class Storage {
     private Long phone;
     @Column(name = "Location")
     private String location;
+    @Column(name = "Status")
+    private String status;
 
     @JsonIgnore
     @OneToMany(mappedBy = "storageToBookStorage", cascade = CascadeType.ALL)

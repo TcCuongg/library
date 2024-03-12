@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Service
 public class BookStorageService {
@@ -15,7 +16,7 @@ public class BookStorageService {
     public BookStorage updateBookStorage(String bookStorageId, String image, String importTime, String quantity){
         BookStorage bookStorage = bookStorageRepository.findFirstById(Long.parseLong(bookStorageId));
         bookStorage.setImage(image);
-        bookStorage.setImportTime(Timestamp.valueOf(importTime));
+        bookStorage.setImportTime(LocalDateTime.parse(importTime));
         bookStorage.setQuantity(Integer.parseInt(quantity));
         return bookStorageRepository.save(bookStorage);
     }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -31,10 +32,14 @@ public class BookStorage {
     private int quantity;
 
     @Column(name = "Import Time")
-    private Timestamp importTime;
+    private LocalDateTime importTime;
 
     @Column(name = "Image")
     private String image;
+
+    @ManyToOne
+    @JoinColumn(name = "Account Import Id")
+    private Account accountToBookStorage;
 
     @JsonIgnore
     @OneToMany(mappedBy = "bookStorageToCart", cascade = CascadeType.ALL)

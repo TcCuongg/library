@@ -1,5 +1,7 @@
 package com.example.library.service;
 
+import com.example.library.entity.Account;
+import com.example.library.entity.MainContent;
 import com.example.library.entity.Notification;
 import com.example.library.repository.AccountRepository;
 import com.example.library.repository.MainContentRepository;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 public class NotificationService {
@@ -20,11 +23,21 @@ public class NotificationService {
     private AccountRepository accountRepository;
 
     public Notification addNewNotification(Long mainContentId, Long accountId){
-        Timestamp timestamp = Timestamp.from(Instant.now());
         Notification notification = new Notification();
-        notification.setAccountToNotification(accountRepository.findFirstByCardNumber(accountId));
-        notification.setMainContentToNotification(mainContentRepository.findFirstById(mainContentId));
-        notification.setSent(timestamp);
+        Account account = accountRepository.findFirstByCardNumber(accountId);
+        MainContent mainContent = mainContentRepository.findFirstById(mainContentId);
+        notification.setAccountToNotification(account);
+        notification.setMainContentToNotification(mainContent);
+        notification.setSent(LocalDateTime.now());
+
+        account.getNotificationsFromAccount().add(notification);
+        account.setNotificationsFromAccount(account.getNotificationsFromAccount());
+        accountRepository.save(account);
+
+        mainContent.getNotificationsFromMainContent().add(notification);
+        mainContent.setNotificationsFromMainContent(mainContent.getNotificationsFromMainContent());
+        mainContentRepository.save(mainContent);
+
         return notificationRepository.save(notification);
     }
 }

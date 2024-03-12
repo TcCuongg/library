@@ -1,0 +1,74 @@
+<div id="body">
+  <div id = "Head">
+    <div id = "name">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "categori">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm sách">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
+      <button style="color: #d35810; padding-left: 3.4rem" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+    </div>
+  </div>
+  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+  <div style="width: 16%; height: 100%; background-color: white; position: absolute; top: 3%; left: 22%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%;">
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+    <a style="color: red; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
+    <a><h3>Quản lý doanh thu</h3></a><br>
+  </div>
+  <div id = "nav">
+    <button style="color: #F78DA7; margin-bottom: 2%; float: right;"  (click)="clickMore()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; margin-bottom: 2%; float: left;"  (click)="clickLast()"><h3>< Quay lại</h3></button>
+    <table>
+      <tr>
+        <th>Tên sách</th>
+        <th>Thể loại</th>
+        <th>Tác giả </th>
+        <th>Nội dung</th>
+        <th>Ảnh</th>
+        <th>Thời gian nhập</th>
+        <th>Số lượng</th>
+      </tr>
+      <tr *ngFor="let item of datasBook" (click)="clickBook(item)">
+        <td>{{item.title}}</td>
+        <td>{{item.category}}</td>
+        <td>{{item.author}}</td>
+        <td>{{item.content}}</td>
+        <td>{{item.image}}</td>
+        <td>{{item.importTime}}</td>
+        <td>{{item.quantity}}</td>
+      </tr>
+    </table>
+    <div id="button">
+      <button id="close" (click)="sendAddBook()">Thêm sách</button>
+    </div>
+  </div>
+  <div id = "footer">
+    <table>
+      <tr style="color: black">
+        <th>Tên sách</th>
+        <th>Thể loại</th>
+        <th>Tác giả </th>
+        <th>Nội dung</th>
+        <th>Ảnh</th>
+        <th>Thời gian nhập</th>
+        <th>Số lượng</th>
+      </tr>
+      <tr *ngIf="book">
+        <td style="color: orange">{{book.title}}</td>
+        <td style="color: orange">{{book.category}}</td>
+        <td style="color: orange">{{book.author}}</td>
+        <td style="color: orange">{{book.content}}</td>
+        <td><input [(ngModel)]="inputImage" type="text" placeholder="{{book.image}}"></td>
+        <td><input [(ngModel)]="inputImportTime" type="text" placeholder="{{book.importTime}}"></td>
+        <td><input [(ngModel)]="inputQuantity" type="text" placeholder="{{book.quantity}}"></td>
+      </tr>
+    </table>
+    <div>
+      <button id="save" (click)="changeBookAndQuantity()">Lưu</button>
+    </div>
+  </div>
+</div>

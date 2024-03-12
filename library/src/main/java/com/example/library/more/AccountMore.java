@@ -11,11 +11,13 @@ public class AccountMore {
     private String phone;
     private String address;
     private String password;
-    public AccountMore(String username, String email, String phone, String address, String password){
+    private String type;
+    public AccountMore(String username, String email, String phone, String address, String password, String type){
         this.username = username;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.password = password;
+        this.type = type;
     }
 }

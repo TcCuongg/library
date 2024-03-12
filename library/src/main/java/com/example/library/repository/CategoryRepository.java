@@ -16,6 +16,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("select category from Category category")
     public List<Category> getCategories(Pageable pageable);
 
+    @Query("select DISTINCT category.name from Category category")
+    public List<String> findAllCategoryName();
+
     @Query("select category from Category category where category.name = :name")
     public List<Category> getCategoriesByTitle(@Param("name") String name, Pageable pageable);
 

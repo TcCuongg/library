@@ -1,7 +1,9 @@
 package com.example.library.controller;
 
+import com.example.library.entity.Book;
 import com.example.library.more.BookManage;
 import com.example.library.more.BookMore;
+import com.example.library.more.SelectBook;
 import com.example.library.repository.BookRepository;
 import com.example.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,12 +67,28 @@ public class BookController {
     public List<BookManage> getBookManageByRequest(@PathVariable String request, @PathVariable int count, @PathVariable int size){
         return bookService.findAllBookManageRequest(request, count, size);
     }
+    @GetMapping("/getAllStatus")
+    public List<String> getAllStatus(){
+        return bookService.findAllStatus();
+    }
 
 
+
+    @PostMapping("/getSelectBook/{count}/{size}")
+    public List<BookManage> getSelectBook(@RequestBody SelectBook selectBook, @PathVariable int count, @PathVariable int size){
+        return bookService.selectBook(selectBook.getCategory(), selectBook.getAuthor(), selectBook.getCostStart(),
+                selectBook.getCostEnd(), selectBook.getStatus(), count, size);
+    }
     @PostMapping("/updateBook/{count}/{size}")
     public List<BookManage> updateBook(@RequestBody BookManage bookManage, @PathVariable int count, @PathVariable int size){
         return bookService.updateBook(bookManage.getBookId(), bookManage.getAuthorId(), bookManage.getTitle(), bookManage.getCategory(),
                 bookManage.getAuthor(), bookManage.getContent(), bookManage.getCost(), bookManage.getSale(),
                 bookManage.getStatus(), count, size);
+    }
+    @PostMapping("/addNewBook")
+    public BookManage addNewBook(@RequestBody BookManage bookManage){
+        return bookService.addNewBook(bookManage.getTitle(), bookManage.getCategory(), bookManage.getAuthor(),
+                bookManage.getContent(), bookManage.getCost().toString(), Integer.toString(bookManage.getSale()),
+                bookManage.getStatus());
     }
 }

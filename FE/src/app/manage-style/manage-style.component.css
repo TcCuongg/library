@@ -1,0 +1,135 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+#body{
+  width: 100%;
+  height: 100%;
+  display: block;
+  text-align: center;
+  align-items: center;
+  position: relative;
+}
+
+#Head{
+  width: 70%;
+  height: 20%;
+  position: absolute;
+  top: 10px;
+  left: 62%;
+  transform: translateX(-50%);
+  display: block;
+  z-index: 1;
+}
+#Head img{
+  width: 2%;
+  height: auto;
+  float: left;
+}
+#name{
+  float: left;
+  text-align: left;
+}
+input{
+  float: left;
+  border: none;
+  width: 35%;
+  margin-left: 4%;
+}
+input:focus-visible{
+  outline: none;
+}
+#categori{
+  padding-top: 1.2%;
+}
+button{
+  border: none;
+  background-color: white;
+}
+#nav{
+  width: 80%;
+  height: 42rem;
+  padding-top: 4.5%;
+  position: absolute;
+  left: 58%;
+  transform: translateX(-50%);
+}
+
+.storage{
+  border: 3px #ED2874 solid;
+  border-radius: 10px;
+  margin: 2%;
+  position: relative;
+  width: 35rem;
+  height: 15rem;
+}
+.storage div{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.storage > div > button{
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+}
+
+#moreStorage{
+  z-index: 100;
+  position: fixed;
+  top: 35%;
+  left: 60%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 35%;
+  background-color: white;
+  float: left;
+  text-align: left;
+  align-items: normal;
+  border: 4px solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0px 2px 2px 2px;
+  display: none;
+}
+#moreStorage img{
+  width: 5%;
+  height: auto;
+  float: right;
+  margin: 2%;
+}
+
+#moreStorage input{
+  margin-bottom: 5%;
+  width: 100%;
+  height: 30px;
+  align-items: center;
+  border-radius: 100px;
+  border-style: solid;
+  border-color: #a4a4a4;
+}
+
+#moreStorage p{
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  color: rgb(3, 52, 167);
+}
+
+#logout{
+  background-color: #ED2874FF;
+  color: white;
+  padding-top: 1%;
+  width: 10rem;
+  height: 2rem;
+  position: absolute;
+  top: 3rem;
+  right: 9rem;
+  z-index: 100;
+  display: none;
+}

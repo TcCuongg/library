@@ -1,0 +1,55 @@
+<div id="body">
+  <div id = "Head">
+    <div id = "name">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "categori">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm thông báo">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
+      <button style="color: #d35810; padding-left: 3.4rem" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+    </div>
+  </div>
+  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+  <div style="width: 16%; height: 100%; background-color: white; position: absolute; top: 3%; left: 22%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%;">
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+    <a><h3 style="color: red;" (click)="clickManageMess()">Quản lý thông báo</h3></a><br>
+    <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
+    <a><h3>Quản lý doanh thu</h3></a><br>
+  </div>
+  <div id = "nav">
+    <button style="color: #F78DA7; margin-bottom: 2%; float: right;"  (click)="clickMore()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; margin-bottom: 2%; float: left;"  (click)="clickLast()"><h3>< Quay lại</h3></button>
+    <table>
+      <tr>
+        <th>Email nhận</th>
+        <th>Loại thông báo</th>
+        <th>Nội dung thông báo</th>
+        <th>Thời gian gửi</th>
+      </tr>
+      <tr *ngFor="let item of datasMess">
+        <td><input type="text" value="{{item.email}}"></td>
+        <td><input type="text" value="{{item.type}}"></td>
+        <td><input type="text" value="{{item.content}}"></td>
+        <td><input type="text" value="{{item.sent}}"></td>
+      </tr>
+    </table>
+    <div id="button">
+      <button id="save" (click)="clickSend()">Gửi thông báo</button>
+    </div>
+  </div>
+  <div id="send" [ngStyle]="changeSend()">
+    <form>
+      <img alt="error" src="assets/icon/close.svg" (click)="clickSend()">
+      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
+        <h3>Tiêu đề</h3>
+        <input [(ngModel)]="valueTitle" type="text" name="title" placeholder="Tiêu đề"><br>
+        <h3>Nội dung</h3>
+        <input [(ngModel)]="valueContent" type="text" name="content" placeholder="Nội dung"><br>
+        <input style="width: 20%; float: right;" type="submit" value="Gửi" (click)="sentNewMess(); clickSend()"><br>
+      </div>
+    </form>
+  </div>
+</div>
