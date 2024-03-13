@@ -267,6 +267,4 @@ export class ManageBookComponent implements OnInit {
       'opacity':this.isNewBook ? '1':'0.2',
     }
   }
-
-  protected readonly isTemplateDiagnostic = isTemplateDiagnostic;
 }

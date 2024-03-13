@@ -29,7 +29,6 @@ const appRoutes : Routes =[
   {path: 'manageStyle', component: ManageStyleComponent},
   {path: 'manageStorage', component: ManageStorageComponent},
   {path: 'manageMess', component: ManageMessComponent},
-  // {path: 'manageBook', component: ManageBookComponent},
 
   {path: 'detailStorage', component: DetailStorageComponent},
   {path: 'addBook', component: AddBookComponent},
