@@ -14,7 +14,6 @@ import { ManageStyleComponent } from './manage-style/manage-style.component';
 import {HttpClientModule} from "@angular/common/http";
 import { ManageStorageComponent } from './manage-storage/manage-storage.component';
 import { ManageMessComponent } from './manage-mess/manage-mess.component';
-// import { ManageBookComponent } from './manage-book/manage-book.component';
 import { DetailStorageComponent } from './detail-storage/detail-storage.component';
 import { AddBookComponent } from './add-book/add-book.component';
 import { ManageBookComponent } from './manage-book/manage-book.component';
@@ -29,6 +28,7 @@ const appRoutes : Routes =[
   {path: 'manageStyle', component: ManageStyleComponent},
   {path: 'manageStorage', component: ManageStorageComponent},
   {path: 'manageMess', component: ManageMessComponent},
+  {path: 'manageBook', component: ManageBookComponent},
 
   {path: 'detailStorage', component: DetailStorageComponent},
   {path: 'addBook', component: AddBookComponent},
@@ -44,7 +44,6 @@ const appRoutes : Routes =[
     ManageStyleComponent,
     ManageStorageComponent,
     ManageMessComponent,
-    // ManageBookComponent,
     DetailStorageComponent,
     AddBookComponent,
     ManageBookComponent

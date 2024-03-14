@@ -30,6 +30,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     public List<BookMore> getAllBook(Pageable pageable);
 
     @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity," +
+            " book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join" +
+            " book.categoryToBook category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
+            " where book.status = 'Đang bán' and storage.status = 'Mở cửa'")
+    public int getCountAllBook();
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
             "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
             "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
             " category on book.categoryToBook.id = category.id" +
@@ -81,6 +92,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
             " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
+            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and category.name = :name and book.status = 'Đang bán'")
+    public int getCountBookByCategory(@Param("name") String name);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
             " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and author.name = :name")
     public List<BookMore> getBookByAuthor(@Param("name") String name, Pageable pageable);
 
@@ -116,6 +138,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
             " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and book.title = :title and book.status = 'Đang bán'")
     public List<BookMore> getBookByTitle(@Param("title") String title, Pageable pageable);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
+            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and book.title = :title and book.status = 'Đang bán'")
+    public int getCountBookByTitle(@Param("title") String title);
 
     @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
             "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
@@ -170,10 +203,36 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
             " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.cartsFromBookStorage cart on bookStorage.id = cart.bookStorageToCart.id" +
+            " inner join cart.accountToCart account on cart.accountToCart.cardNumber = account.cardNumber" +
+            " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
+            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and account.cardNumber = :cardNumber")
+    public int getCountAllBookByAccountCart(@Param("cardNumber") Long cardNumber);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
             " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
             " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
             " where account.cardNumber = :cardNumber")
     public List<BookMore> getAllBookByAccountBuy(@Param("cardNumber") Long cardNumber, Pageable pageable);
+
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber")
+    public int getCountAllBookByAccountBuy(@Param("cardNumber") Long cardNumber);
 
 
     @Query("select new com.example.library.more.BookManage(book.id, author.id, book.title, book.cost, book.content, book.status, book.sale" +
@@ -181,6 +240,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " book.categoryToBook.id = category.id inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id")
     public List<BookManage> getAllBookManage(Pageable pageable);
+
+    @Query("select new com.example.library.more.BookManage(book.id, author.id, book.title, book.cost, book.content, book.status, book.sale" +
+            ", category.name, author.name) from Book book inner join book.categoryToBook category on" +
+            " book.categoryToBook.id = category.id inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id")
+    public int getCountAllBookManage();
 
 //    String category, String author, String costStart, String costEnd, String status
     @Query("select new com.example.library.more.BookManage(book.id, author.id, book.title, book.cost, book.content, book.status, book.sale" +
@@ -194,6 +259,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                                        @Param("costStart") Long costStart, @Param("costEnd") Long costEnd,
                                        @Param("status") String status, Pageable pageable);
 
+    @Query("select new com.example.library.more.BookManage(book.id, author.id, book.title, book.cost, book.content, book.status, book.sale" +
+            ", category.name, author.name) from Book book inner join book.categoryToBook category on" +
+            " book.categoryToBook.id = category.id inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " where (:categoryName is null or category.name = :categoryName) and" +
+            " (:authorName is null or author.name = :authorName) and (:status is null or book.status = :status)")
+    public int countSelectBook(@Param("categoryName") String categoryName, @Param("authorName") String authorName, @Param("status") String status);
 
     @Query("select new com.example.library.more.BookManage(book.id, author.id, book.title, book.cost, book.content, book.status, book.sale" +
             ", category.name, author.name) from Book book inner join book.categoryToBook category on" +

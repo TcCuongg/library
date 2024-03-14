@@ -15,6 +15,9 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
     @Query("select storage from Storage storage")
     public List<Storage> findAllStorage(Pageable pageable);
 
+    @Query("select bookStorage.id from Storage storage inner join storage.bookStoragesFromStorage bookStorage on storage.id = bookStorage.storageToBookStorage.id")
+    public List<Long> findAllBookStorageId();
+
     public List<Storage> findAllByLocation(String location, Pageable pageable);
     public List<Storage> findAllByPhone(Long phone, Pageable pageable);
 

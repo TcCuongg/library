@@ -44,6 +44,6 @@ public class StorageController {
 
     @PutMapping("/updateStorage/{count}/{size}")
     public List<Storage> updateStorage(@RequestBody StorageSave storageSave, @PathVariable int count, @PathVariable int size){
-        return storageService.updateBook(Long.parseLong(storageSave.getStorageId()), storageSave.getStatus(), count, size);
+        return storageService.updateStorage(Long.parseLong(storageSave.getStorageId()), storageSave.getStatus(), count, size);
     }
 }

@@ -4,9 +4,11 @@ import com.example.library.entity.Account;
 import com.example.library.entity.BookStorage;
 import com.example.library.entity.Buy;
 import com.example.library.repository.AccountRepository;
+import com.example.library.repository.BookRepository;
 import com.example.library.repository.BookStorageRepository;
 import com.example.library.repository.BuyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -21,8 +23,13 @@ public class BuyService {
     private BookStorageRepository bookStorageRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private RedisTemplate redisBuyTemplate;
 
     public Buy addNewBuy(Long bookStorageId, Long accountId, Long cost, String status){
+        int getCountAllBookByAccountBuy = bookRepository.getCountAllBookByAccountBuy(accountId);
         Account account = accountRepository.findFirstByCardNumber(accountId);
         BookStorage bookStorage = bookStorageRepository.findFirstById(bookStorageId);
         Buy buy = new Buy();
@@ -39,6 +46,8 @@ public class BuyService {
         bookStorage.getBuysFromBookStorage().add(buy);
         bookStorage.setBuysFromBookStorage(bookStorage.getBuysFromBookStorage());
         bookStorageRepository.save(bookStorage);
+
+        redisBuyTemplate.delete("findAllBookByAccountBuy:" + accountId + "(" + getCountAllBookByAccountBuy/8 + ", " + 8 + ")");
 
         return buyRepository.save(buy);
     }

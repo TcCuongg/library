@@ -7,6 +7,7 @@ import com.example.library.repository.AccountRepository;
 import com.example.library.repository.MainContentRepository;
 import com.example.library.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -21,6 +22,8 @@ public class NotificationService {
     private MainContentRepository mainContentRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private RedisTemplate redisNotificationTemplate;
 
     public Notification addNewNotification(Long mainContentId, Long accountId){
         Notification notification = new Notification();
@@ -37,6 +40,10 @@ public class NotificationService {
         mainContent.getNotificationsFromMainContent().add(notification);
         mainContent.setNotificationsFromMainContent(mainContent.getNotificationsFromMainContent());
         mainContentRepository.save(mainContent);
+
+        redisNotificationTemplate.delete("findAllMess(" + accountRepository.findCountAllMess()/11 + ", " + 11 + ")");
+        redisNotificationTemplate.delete(redisNotificationTemplate.keys("findAllMessByRequest: *"));
+        redisNotificationTemplate.delete(redisNotificationTemplate.keys("findMessByTimeSent:*"));
 
         return notificationRepository.save(notification);
     }

@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AccountService {
@@ -68,7 +69,7 @@ public class AccountService {
         List<Account> accountList = new ArrayList<>();
         List<AccountRedis> accountRedisList = new ArrayList<>();
 
-        String redisKey = "findAllByRequest:" + request + "(" + count + ", " + size + ")";
+        String redisKey = "findAllAccountByRequest:" + request + "(" + count + ", " + size + ")";
 
         boolean hasKey = redisAccountRedisTemplate.hasKey(redisKey);
 
@@ -404,16 +405,39 @@ public class AccountService {
             account.setType(type);
 
             account.setTimeCreate(LocalDateTime.now());
-        }
-        return accountRepository.save(account);
-    }
+            accountRepository.save(account);
 
+            redisAccountRedisTemplate.delete("getAllAccount(" + accountRepository.getCountAllAccount()/11 + ", " + 11 + ")");
+
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+address+"(*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+email+"(*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+username+"(*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:opend(*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:10(*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+phone+"(*"));
+
+            redisAccountRedisTemplate.delete("findAllMess(" + accountRepository.findCountAllMess()/11 + ", " + 11 + ")");
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAccountByTimeCreate:*"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
+        }
+        return account;
+    }
     public List<Account> closeAccountLowLevel(){
         List<Account> accounts = accountRepository.findAllByLowLevel();
         for(int i = 0; i < accounts.size(); i++)
         {
             accounts.get(i).setStatus("close");
         }
+//        if(!accounts.isEmpty()){
+//            Set<String> keys = redisAccountRedisTemplate.keys("account-*");
+//            if (keys != null && !keys.isEmpty()) {
+//                redisAccountRedisTemplate.delete(keys);
+//            }
+//            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("getByEmailAndPassword:*"));
+//        }
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:close(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:opend(*"));
         return accountRepository.saveAll(accounts);
     }
     public List<Account> updateAccount(Long cardNumber, String name, String email, String phone,
@@ -426,10 +450,19 @@ public class AccountService {
         account.setLevel(Integer.parseInt(level));
         account.setStatus(status);
         accountRepository.save(account);
-        Pageable pageable = PageRequest.of(count, size);
-        return accountRepository.getAllAccount(pageable);
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("getAllAccount(" + count + ", " + size + ")"));
+
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+address+"(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+email+"(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+name+"(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+status+"(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+level+"(*"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+phone+"(*"));
+
+        return getAllAccount(count, size);
     }
     public List<Mess> addNewMess(String title, String content, int count, int size){
+        int findCountAllMess = accountRepository.findCountAllMess()/11;
         MainContent mainContent = new MainContent();
         List<Account> accountList = accountRepository.findAllAccount();
         mainContent.setType(title);
@@ -449,7 +482,9 @@ public class AccountService {
         }
         mainContent.setNotificationsFromMainContent(notificationList);
         mainContentRepository.save(mainContent);
-
+        redisAccountRedisTemplate.delete("findAllMess(" + findCountAllMess + ", " + 11 + ")");
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
+        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
         accountRepository.saveAll(accountList);
         return findAllMess(count, size);
     }
