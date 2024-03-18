@@ -238,17 +238,9 @@ export class ManageBookComponent implements OnInit {
     this.getAll(this.count);
   }
 
-  buttonText:any[]=[{text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}, {text: 'Sửa'}];
   isSetting:any[]=[{status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}]
   changeText(index: number) {
-    if(this.buttonText[index].text == 'Sửa'){
-      this.buttonText[index].text = 'Lưu';
-      this.isSetting[index].status = true;
-    }
-    else {
-      this.buttonText[index].text = 'Sửa';
-      this.isSetting[index].status = false;
-    }
+    this.isSetting[index].status = !this.isSetting[index].status;
   }
 
   isNewBook = true;

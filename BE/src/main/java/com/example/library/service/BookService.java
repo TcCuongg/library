@@ -146,14 +146,13 @@ public class BookService {
 
         if(hasKey){
             BookMoreRedis bookMoreRedis = (BookMoreRedis) redisBookMoreTemplate.opsForValue().get(redisKey);
-            return new BookMore(bookMoreRedis);
+            BookMore bookMore = new BookMore(bookMoreRedis);
+            return bookMore;
         }
         else {
             BookMore bookMore = bookRepository.getBookByBookStorageId(bookStorageId);
-            if(bookMore != null){
-                BookMoreRedis bookMoreRedis = new BookMoreRedis(bookMore);
-                redisBookMoreTemplate.opsForList().rightPushAll(redisKey, bookMoreRedis);
-            }
+            BookMoreRedis bookMoreRedis = new BookMoreRedis(bookMore);
+            redisBookMoreTemplate.opsForValue().set(redisKey, bookMoreRedis);
             return bookMore;
         }
 //        return bookRepository.getBookByBookStorageId(bookStorageId);

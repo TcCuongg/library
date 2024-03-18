@@ -79,11 +79,11 @@ export class ManageStyleComponent implements OnInit{
 
   clickMorefirst(){
     if (this.dataCategory.length==4){
-      this.count = this.count + 1;
-      this.productService.getCategory(this.count, 4).subscribe((res:any) => {
+      this.productService.getCategory(this.count + 1, 4).subscribe((res:any) => {
         this.dataCheckCategory = res
       })
       if(this.dataCheckCategory.length != 0){
+        this.count = this.count + 1;
         this.dataCategory = this.dataCheckCategory;
       }
     }

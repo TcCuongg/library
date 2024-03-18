@@ -4,20 +4,21 @@
 }
 
 #body{
-  width: 100%;
+  width: 84%;
   height: 100%;
   display: block;
   text-align: center;
   align-items: center;
-  position: relative;
+  position: fixed;
+  right: 0;
 }
 
 #Head{
-  width: 70%;
-  height: 20%;
+  width: 80%;
+  height: 8%;
   position: absolute;
-  top: 10px;
-  left: 65%;
+  padding-top: 1%;
+  left: 50%;
   transform: translateX(-50%);
   z-index: 1;
 }
@@ -47,12 +48,12 @@ button{
   background-color: white;
 }
 #nav{
-  width: 80%;
-  height: 42rem;
-  padding-top: 7%;
+  width: 90%;
+  height: 38rem;
   position: absolute;
-  left: 58%;
-  transform: translateX(-50%);
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -48%);
 }
 table{
   width: 100%;
@@ -64,7 +65,7 @@ tr{
   height: 2.5rem;
 }
 th, td {
-  border: 3px solid #57445A;
+  border: 0.15rem solid #57445A;
   text-align: center;
 }
 
@@ -113,96 +114,101 @@ td input{
 #footer{
   width: 76.5%;
   height: 18%;
-  left: 57.9%;
-  transform: translateX(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: white;
-  border: 3px solid #57445A;
+  border: 0.15rem solid #57445A;
   align-items: center;
   text-align: center;
   padding: 1rem;
   color: white;
-  position: fixed;
-  box-shadow: 10px 10px 10px 10px #8d8a8a;
-  top: 40%;
-  z-index: 2;
+  position: absolute;
+  box-shadow: 0.5rem 0.5rem 0.2rem 0.5rem #8d8a8a;
+  top: 50%;
 }
 
 #logout{
-  background-color: #ED2874FF;
   color: white;
-  padding-top: 1%;
-  width: 10%;
-  height: 2rem;
-  position: absolute;
-  top: 3rem;
-  right: 6.8rem;
-  z-index: 100;
-  display: none;
+  width: 100%;
+  height: 49%;
+}
+
+#setting{
+  color: white;
+  width: 100%;
+  height: 49%;
 }
 
 #search {
-  z-index: 10;
-  position: fixed;
-  top: 8%;
+  position: absolute;
   width: 80%;
-  left: 24%;
+  height: auto;
+  top: 5rem;
+  left: 50%;
+  transform: translate(-50%);
+  float: none;
+  z-index: 0;
 }
 
 #moreCategory{
-  width: 16%;
+  width: 14%;
   height: auto;
   background-color: white;
-  position: fixed;
-  top: 12%;
-  left: 21%;
+  position: absolute;
+  top: 38%;
+  left: 20%;
+  transform: translate(-80%, -62%);
   z-index: 100;
-  border-radius: 20px;
-  border: 1px;
+  border-radius: 1.5rem;
+  border: 0.1rem;
   border-color: black;
   border-style: solid;
   display: none;
 }
 
 #moreAuthor{
-  width: 16%;
+  width: 14%;
   height: auto;
   background-color: white;
-  position: fixed;
-  top: 12%;
-  left: 35%;
+  position: absolute;
+  top: 19%;
+  left: 35.5%;
+  transform: translate(-64.5%, -81%);
   z-index: 100;
-  border-radius: 20px;
-  border: 1px;
+  border-radius: 1.5rem;
+  border: 0.1rem;
   border-color: black;
   border-style: solid;
   display: none;
 }
 
 #moreCost{
-  width: 12%;
+  width: 14%;
   height: 18%;
   background-color: white;
-  position: fixed;
-  top: 12%;
-  left: 51.5%;
+  position: absolute;
+  top: 27%;
+  left: 51%;
+  transform: translate(-49%, -73%);
   z-index: 100;
-  border-radius: 20px;
-  border: 1px;
+  border-radius: 1.5rem;
+  border: 0.1rem;
   border-color: black;
   border-style: solid;
   display: none;
 }
 
 #moreStatus{
-  width: 16%;
+  width: 14%;
   height: auto;
   background-color: white;
-  position: fixed;
-  top: 12%;
-  left: 64.5%;
+  position: absolute;
+  top: 23%;
+  left: 67.5%;
+  transform: translate(-32.5%, -77%);
   z-index: 100;
-  border-radius: 20px;
-  border: 1px;
+  border-radius: 1.5rem;
+  border: 0.1rem;
   border-color: black;
   border-style: solid;
   display: none;

@@ -1,3 +1,11 @@
+<div style="width: 16%; height: 100%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%; text-align: center">
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+  <a><h3 style="color: red;" (click)="clickManageStorage()">Quản lý kho</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
+  <a><h3>Quản lý doanh thu</h3></a><br>
+</div>
 <div id="body">
   <div id = "Head">
     <div id = "name">
@@ -7,30 +15,25 @@
     <div id = "categori">
       <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm kho">
       <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
-      <button style="color: #d35810; padding-left: 3.4rem" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <button style="color: #d35810; padding-left: 3.4rem; float: right" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <div style="width: 12%; height: auto; position: absolute; top: 90%; right: 0; transform: translateY(-10%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 10;" [ngStyle]="changeLogout()">
+        <div id = "setting">Cài đặt</div><br>
+        <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+      </div>
     </div>
-  </div>
-  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
-  <div style="width: 16%; height: 100%; background-color: white; position: absolute; top: 3%; left: 22%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%;">
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
-    <a><h3 style="color: red;" (click)="clickManageStorage()">Quản lý kho</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
-    <a><h3>Quản lý doanh thu</h3></a><br>
   </div>
   <div id = "nav">
     <button style="color: #F78DA7; margin-bottom: 2%; float: right;" (click)="clickMore()"><h3>Xem thêm ></h3></button>
     <button style="color: #F78DA7; margin-bottom: 2%; float: left;" (click)="clickLast()"><h3>< Quay lại</h3></button>
-    <div style="display: grid; grid-template-columns: 50% 50%; width: 100%; height: 80%; margin-top: 12%;">
+    <div style="display: grid; grid-template-columns: 50% 50%; width: 100%; height: 80%; margin-top: 6%;">
       <div class="storage" *ngFor="let item of datasStorage">
         <div style="position: absolute; top: 40%" (click)="sendContentStorage(item)">
           <h1>{{item.phone}}</h1>
           <h2>{{item.location}}</h2>
         </div>
-        <div style="position: absolute; top: 62%; left: 50%; transform: translateX(-50%); width: 42%">
+        <div style="position: absolute; top: 62%; left: 50%; transform: translateX(-50%); width: 55%">
           <h2 style="float: left">Trạng thái:</h2>
-          <input style="padding-top: 1.8%; font-weight: bold; font-size: larger; width: 46%; float: left; color: #7a7979" #input type="text" name="status" placeholder="{{item.status}}">
+          <input style="padding-top: 1.8%; font-weight: bold; font-size: larger; width: 38%; float: left; color: #7a7979" #input type="text" name="status" placeholder="{{item.status}}">
         </div>
         <button style="position: absolute; top: 78%; left: 50%; transform: translateX(-50%); color: rgb(3, 52, 167); border: none; font-size: large; font-weight: 600;" (click)="changeStorage(item, input.value)">Lưu</button>
       </div>

@@ -17,6 +17,8 @@ import { ManageMessComponent } from './manage-mess/manage-mess.component';
 import { DetailStorageComponent } from './detail-storage/detail-storage.component';
 import { AddBookComponent } from './add-book/add-book.component';
 import { ManageBookComponent } from './manage-book/manage-book.component';
+import { ManageAuthorComponent } from './manage-author/manage-author.component';
+import { ManagePayComponent } from './manage-pay/manage-pay.component';
 
 const appRoutes : Routes =[
   {path: 'bookStore', component: MainComponent},
@@ -32,6 +34,9 @@ const appRoutes : Routes =[
 
   {path: 'detailStorage', component: DetailStorageComponent},
   {path: 'addBook', component: AddBookComponent},
+
+  {path:'manageAuthor', component: ManageAuthorComponent},
+  {path:'managePay', component: ManagePayComponent}
 ]
 @NgModule({
   declarations: [
@@ -46,7 +51,9 @@ const appRoutes : Routes =[
     ManageMessComponent,
     DetailStorageComponent,
     AddBookComponent,
-    ManageBookComponent
+    ManageBookComponent,
+    ManageAuthorComponent,
+    ManagePayComponent
   ],
   imports: [
     BrowserModule,

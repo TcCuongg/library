@@ -46,10 +46,17 @@ export class ManageStorageComponent implements OnInit{
       this.datasStorage = res
     })
   }
+
+  datasCheckStorage:Storage[] = []
   clickMore(){
     if (this.datasStorage.length==3){
-      this.count = this.count + 1;
-      this.getAllStorage(this.count);
+      this.productService.getAllStorage(this.count + 1, 3).subscribe((res:any)=>{
+        this.datasCheckStorage = res
+      })
+      if(this.datasCheckStorage.length != 0){
+        this.count = this.count + 1;
+        this.datasStorage = this.datasCheckStorage;
+      }
     }
   }
 

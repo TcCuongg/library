@@ -210,8 +210,10 @@ export class MoreComponent implements OnInit{
   }
 
   clickLogout(){
+    this.checkUser()
     this.valueSave.clear();
     this.dataAccount = undefined;
+    this.clickUser();
   }
 
   clickLoginPost(){
@@ -226,12 +228,12 @@ export class MoreComponent implements OnInit{
         this.isClickLogin = !this.isClickLogin;
         this.checkUser();
         this.valueSave.clear();
-        this.valueSave.setItem('value', JSON.stringify(this.dataAccount));
-        this.dataAccount = JSON.parse(this.valueSave.getItem('value'));
-        this.getBooks(this.count);
+        this.valueSave.setItem('value', JSON.stringify(this.dataAccount))
       }
       else if(this.dataAccount?.type == 'admin' && this.dataAccount.status != 'close'){
-        let data = { message: this.dataAccount?.email};
+        this.valueSave.clear();
+        this.valueSave.setItem('value', JSON.stringify(this.dataAccount))
+        let data = { message: this.dataAccount.name};
         this.router.navigate(['/manageUser', data]);
       }
     }

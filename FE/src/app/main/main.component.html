@@ -5,20 +5,25 @@
       <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
     </div>
     <div id = "cate">
-      <h3 style="float: left; padding-left: 3%;">Tất cả thể loại</h3>
-      <img style="width: 1.5%; transform: rotate(90deg); margin: auto 4%;" alt="error" src="assets/icon/More.svg" (click)="clickMore()">
+      <div style="width: 20%; height: auto; float: left; margin-left: 3%;">
+        <h3 style="float: left; margin-left: 6%">Tất cả thể loại</h3>
+        <img style="width: 8%; transform: rotate(90deg); margin-left: 14%;" alt="error" src="assets/icon/More.svg" (click)="clickMore()">
+        <div id = "more" [ngStyle]="changeMore()">
+          <p></p><br>
+          <div *ngFor="let item of datasCategory">
+            <a (click)="sendByCategory(item)"><h3>{{item.name}}</h3></a><br>
+          </div>
+        </div>
+      </div>
       <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm sách">
-      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="sendInputValue()">
-      <button (click)="send('Giỏ hàng')">| Giỏ hàng |</button>
-      <button (click)="clickLogin()" [ngStyle]="lastLogin1()">Đăng nhập</button>
-      <button style="color: #d35810; display: none" [ngStyle]="lastLogin2()" *ngIf="dataAccount" (click)="clickUser()">{{dataAccount.name}}</button>
-    </div>
-  </div>
-  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()">Đăng xuất</div>
-  <div id = "more" [ngStyle]="changeMore()">
-    <p></p><br>
-    <div *ngFor="let item of datasCategory">
-      <a (click)="sendByCategory(item)"><h3>{{item.name}}</h3></a><br>
+      <img alt="error" src="assets/icon/Search.svg" style="" (click)="sendInputValue()">
+      <button style="position: absolute; left: 82%; transform: translateX(-18%)" (click)="send('Giỏ hàng')">Giỏ hàng</button>
+      <button style="float: right" (click)="clickLogin()" [ngStyle]="lastLogin1()">Đăng nhập</button>
+      <button style="color: #d35810; display: none; float: right" [ngStyle]="lastLogin2()" *ngIf="dataAccount" (click)="clickUser()">{{dataAccount.name}}</button>
+      <div style="width: 12%; height: auto; position: absolute; top: 88%; left: 92%; transform: translate(-8%, -12%); background-color: #ED2874FF; text-align: center; padding: 1rem" [ngStyle]="changeLogout()">
+        <div id = "setting">Cài đặt</div><br>
+        <div id = "logout" (click)="clickLogout()">Đăng xuất</div>
+      </div>
     </div>
   </div>
   <div id = "nav" *ngIf="top">
@@ -26,8 +31,10 @@
     <div>
       <div id = "image">
         <img id="favoriteImage" alt="error" src="{{top.image}}" (click)="sendBookContent(top)"><br>
-        <button style="width: 3rem; height: 2rem; background-color: #ED2874; border: none; border-radius: 10px; color: white; float: left; margin-left: 1rem;" (click)="clickSaveCart(top)">Lưu</button>
-        <button style="width: 6rem; height: 2rem; background-color: #ED2874; border: none; border-radius: 10px; color: white; " (click)="sendToBuy(top)">Mua truyện</button>
+        <div style="width: 100%; height: auto">
+          <button style="width: 26%; height: 2rem; background-color: #ED2874; border: none; border-radius: 0.5rem; color: white; float: left" (click)="clickSaveCart(top)">Lưu</button>
+          <button style="width: 70%; height: 2rem; background-color: #ED2874; border: none; border-radius: 0.5rem; color: white; float: right" (click)="sendToBuy(top)">Mua truyện</button>
+        </div>
       </div>
       <div style="width: 70%; height: 100%; position: absolute; right: 0px">
         <h2 style="margin-top: 2%;">Sách được yêu thích nhất tuần</h2><br>
@@ -47,13 +54,13 @@
       <div style="background-color: white" *ngFor="let item of datasDesc" (click)="sendBookContent(item)">
         <img src="{{item.image}}" alt="error">
         <h3>{{item.title}}</h3><br>
-        <div style="transform: translateX(6%)">
-          <p style="color: #6e6464; text-decoration: line-through; float: left;">{{item.cost}}VND</p>
-          <p style="float: left; margin-left: 4%; padding: 0px 2%; background-color: #fcbcbc; color: red; border-radius: 1px">-{{item.sale}}%</p>
-          <p style="color: #DB1037;">{{(item.cost ?? 0) - ((item.cost ?? 0) * (item.sale ?? 0) / 100)}}VND</p>
-        </div>
         <div>
-          <p style="margin-top: 6%;">Đã bán {{item.follow}}</p>
+          <p style="color: #6e6464; text-decoration: line-through; float: left; margin-left: 4%">{{item.cost}}VND</p>
+          <p style="float: left; margin-left: 3%; background-color: #fcbcbc; color: red; border-radius: 1px">-{{item.sale}}%</p>
+          <p style="color: #DB1037; float: right; margin-right: 4%">{{(item.cost ?? 0) - ((item.cost ?? 0) * (item.sale ?? 0) / 100)}}VND</p>
+        </div><br>
+        <div>
+          <p style="margin-top: 6%; float: none">Đã bán {{item.follow}}</p>
         </div>
       </div>
     </div>
@@ -64,11 +71,11 @@
       <div style="background-color: white" *ngFor="let item of datasAll" (click)="sendBookContent(item)">
         <img src="{{item.image}}" alt="error">
         <h3>{{item.title}}</h3><br>
-        <div style="transform: translateX(6%)">
-          <p style="color: #6e6464; text-decoration: line-through; float: left;">{{item.cost}}VND</p>
-          <p style="float: left; margin-left: 4%; padding: 0px 2%; background-color: #fcbcbc; color: red; border-radius: 1px">-{{item.sale}}%</p>
-          <p style="color: #DB1037;">{{(item.cost ?? 0) - ((item.cost ?? 0) * (item.sale ?? 0) / 100)}}VND</p>
-        </div>
+        <div>
+          <p style="color: #6e6464; text-decoration: line-through; float: left; margin-left: 4%">{{item.cost}}VND</p>
+          <p style="float: left; margin-left: 3%; background-color: #fcbcbc; color: red; border-radius: 1px">-{{item.sale}}%</p>
+          <p style="color: #DB1037; float: right; margin-right: 4%">{{(item.cost ?? 0) - ((item.cost ?? 0) * (item.sale ?? 0) / 100)}}VND</p>
+        </div><br>
         <div>
           <p style="margin-top: 6%;">Đã bán {{item.follow}}</p>
         </div>
@@ -81,33 +88,33 @@
   <div id="login" [ngStyle]="changeLogin()">
     <form>
       <img alt="error" src="assets/icon/close.svg" (click)="clickLogin()">
-      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 10px;">Chào mừng trở lại</h2><br>
-      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
-        <h3>Email đăng nhập</h3>
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Chào mừng trở lại</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
+        <h3 style="margin-left: 5%">Email đăng nhập</h3><br>
         <input [(ngModel)]="inputValueEmail" type="text" name="userName" placeholder="Email đăng nhập"><br>
-        <h3>Mật khẩu</h3>
+        <h3 style="margin-left: 5%">Mật khẩu</h3>
         <input [(ngModel)]="inputValuePass" type="text" name="password" placeholder="Mật khẩu"><br>
-        <input style="width: 20%; float: right;" type="submit" value="Đăng nhập" (click)="clickLoginPost()"><br>
-        <p (click)="clickNewUser(); clickLogin()">Đăng ký tài khoản mới?</p>
+        <input style="width: 20%; float: right; margin-right: 5%" type="submit" value="Đăng nhập" (click)="clickLoginPost()"><br>
+        <p style="margin-right: 5%" (click)="clickNewUser(); clickLogin()">Đăng ký tài khoản mới?</p>
       </div>
     </form>
   </div>
   <div id="newUser" [ngStyle]="changeNewUser()">
     <form>
       <img alt="error" src="assets/icon/close.svg" (click)="clickNewUser()">
-      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 10px;">Đăng ký tài khoản mới</h2><br>
-      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
-        <h3>Tên đăng nhập</h3>
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Đăng ký tài khoản mới</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
+        <h3 style="margin-left: 5%">Tên đăng nhập</h3>
         <input [(ngModel)]="inputValueName" type="text" name="userName" placeholder="Tên đăng nhập"><br>
-        <h3>Email đăng nhập</h3>
+        <h3 style="margin-left: 5%">Email đăng nhập</h3>
         <input [(ngModel)]="inputValueAddEmail" type="text" name="Email" placeholder="Email đăng nhập"><br>
-        <h3>SĐT liên hệ</h3>
-        <input [(ngModel)]="inputValuePhone" type="text" name="Phone" placeholder="SĐT liện hệ"><br>
-        <h3>Địa chỉ</h3>
+        <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+        <input style="float: none" [(ngModel)]="inputValuePhone" type="text" name="Phone" placeholder="SĐT liện hệ"><br>
+        <h3 style="margin-left: 5%">Địa chỉ</h3>
         <input [(ngModel)]="inputValueAddress" type="text" name="address" placeholder="Địa chỉ"><br>
-        <h3>Mật khẩu</h3>
+        <h3 style="margin-left: 5%; float: none">Mật khẩu</h3>
         <input [(ngModel)]="inputValueAddPass" type="text" name="password" placeholder="Mật khẩu"><br>
-        <input style="width: 20%; float: right;" type="submit" value="Đăng ký" (click)="clickAddUser();  clickNewUser(); clickLogin()"><br>
+        <input style="width: 20%; float: right; margin-right: 5%" type="submit" value="Đăng ký" (click)="clickAddUser();  clickNewUser(); clickLogin()"><br>
       </div>
     </form>
   </div>

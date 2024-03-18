@@ -138,8 +138,10 @@ export class SearchComponent implements OnInit{
   }
 
   clickLogout(){
+    this.checkUser()
     this.valueSave.clear();
     this.dataAccount = undefined;
+    this.clickUser();
   }
 
   clickLoginPost(){
