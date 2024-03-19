@@ -47,6 +47,16 @@
       </div>
     </div>
   </div>
+  <div id = "messBuy" *ngIf="book" [ngStyle]="changeMessBuy()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isClickBuy = !isClickBuy">
+    <h2 style="position: absolute; left: 50%; transform: translateX(-50%); top: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Thông báo</h2><br>
+    <div style="margin-top: 6%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
+      <h3>Đơn hàng {{book.title}} đặt hàng thành công, người bán hàng đang chuẩn bị!</h3><br>
+      <h3 style="float: left; margin-right: 1%; margin-left: 10%">Đơn giá: </h3><p style="color: red;float: left"> {{book.cost}}VND</p><br><br>
+      <h3 style="float: left; margin-right: 1%; margin-left: 10%">Giảm giá: </h3><p style="color: red; float: left"> {{((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p><br><br>
+      <h3 style="float: left; margin-right: 1%; margin-left: 10%">Thành giá: </h3><p style="color: red; float: left">{{((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p>
+    </div>
+  </div>
   <div id = "footer">
     <h3>Chào mừng đến hiệu sách của chúng tôi</h3>
   </div>

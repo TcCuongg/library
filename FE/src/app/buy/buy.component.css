@@ -111,3 +111,27 @@ button{
   display: none;
   float: left;
 }
+
+#messBuy{
+  width: 50%;
+  height: 30%;
+  z-index: 2;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  background-color: white;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+
+#messBuy img{
+  width: 4%;
+  height: auto;
+  float: right;
+  margin: 1%;
+}

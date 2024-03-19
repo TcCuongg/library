@@ -660,10 +660,6 @@ public class BookService {
     }
     public List<BookManage> updateBook(Long bookId, Long authorId, String title, String categoryName, String authorName, String content, Long cost,
                                        int sale, String status, int count, int size){
-        int getCountBookByTitle = bookRepository.getCountBookByTitle(title);
-        int getCountBookByCategory = bookRepository.getCountBookByCategory(categoryName);
-        int getCountAllBookManage = bookRepository.getCountAllBookManage();
-        int countSelectBook = bookRepository.countSelectBook(categoryName, authorName, status);
         List<BookManage> bookManageList = new ArrayList<>();
         if(categoryRepository.findFirstByName(categoryName) != null && authorRepository.findFirstByName(authorName) != null){
             AuthorBook authorBook = authorBookRepository.findAuthorBookByAuthorIdAndBookId(authorId, bookId);
@@ -676,7 +672,6 @@ public class BookService {
             book.setSale(sale);
             book.setStatus(status);
             bookRepository.save(book);
-            bookManageList = findAllBookManage(count, size);
 //            redisBookManageTemplate.delete("getAllBook(*");
 //            redisBookManageTemplate.delete("getBookFollowDesc(*");
 //            redisBookManageTemplate.delete("getBookByTitle:" + title + "(*");
@@ -698,6 +693,8 @@ public class BookService {
             redisBookManageTemplate.delete("findAllBookManageRequest:" + title +"(*");
             redisBookManageTemplate.delete("findAllBookManageRequest:" + sale +"(*");
             redisBookManageTemplate.delete("findAllBookManageRequest:" + cost +"(*");
+            redisBookManageTemplate.delete("findAllBookManage(" + count + ", " + size + ")");
+            bookManageList = findAllBookManage(count, size);
             return bookManageList;
         }
         else return bookManageList;

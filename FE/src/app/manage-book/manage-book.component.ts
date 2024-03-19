@@ -17,25 +17,26 @@ export class ManageBookComponent implements OnInit {
   dataCategory:string[]=[];
   dataAuthor:string[]=[];
   dataStatus:string[]=[];
+  isCheck = false;
 
   Min = '';
   Max = '';
-  categoryName:string | null = null;
-  authorName:string | null = null;
-  bookStatus:string | null = null;
+  categoryName = 'Tất cả thể loại';
+  authorName = 'Tất cả tác giả';
+  bookStatus = 'Tất cả trạng thái';
   bookCost:string | null = null;
 
   data:any;
 
   count = 0;
   inputValue: string = '';
-  inputTitle = '';
-  inputCategory = '';
-  inputAuthor = '';
-  inputContent = '';
-  inputCost = '';
-  inputSale = '';
-  inputStatus = '';
+  inputTitle: string[] = new Array(11).fill("");
+  inputCategory: string[] = new Array(11).fill("");
+  inputAuthor: string[] = new Array(11).fill("");
+  inputContent: string[] = new Array(11).fill("");
+  inputCost: string[] = new Array(11).fill("");
+  inputSale: string[] = new Array(11).fill("");
+  inputStatus: string[] = new Array(11).fill("");
 
   valueSave:any;
 
@@ -43,7 +44,6 @@ export class ManageBookComponent implements OnInit {
   admin:Account | undefined;
 
   logOut = false;
-  isCheck=false;
   isClickCategoryMore = false;
   isClickAuthorMore = false;
   isClickCostMore = false;
@@ -66,12 +66,15 @@ export class ManageBookComponent implements OnInit {
 
   selectCategory(categoryName:string){
     this.categoryName = categoryName;
+    this.clickCategoryMore();
   }
   selectAuthor(authorName:string){
     this.authorName = authorName;
+    this.clickAuthorMore();
   }
   selectBookStatus(bookStatus:string){
     this.bookStatus = bookStatus;
+    this.clickStatusMore();
   }
 
   clickCategoryMore(){
@@ -107,6 +110,7 @@ export class ManageBookComponent implements OnInit {
       'display':this.isClickCostMore ? 'block':'none'
     }
   }
+
   clickStatusMore(){
     this.isClickStatusMore = !this.isClickStatusMore;
     this.isClickCostMore = false;
@@ -159,42 +163,35 @@ export class ManageBookComponent implements OnInit {
       'color' : 'white',
     }
   }
-  changeBook(){
-    const url = 'http://localhost:8080/book/updateBook/0/100';
+  changeBook(i:number){
+    const url = 'http://localhost:8080/book/updateBook/'+this.count+'/11';
     const body = {bookId: this.book?.bookId, authorId: this.book?.authorId,
-      title: this.inputTitle, cost: Number(this.inputCost), status: this.inputStatus,
-      category: this.inputCategory, author: this.inputAuthor, sale: Number(this.inputSale), content: this.inputContent}
+      title: this.inputTitle[i], cost: Number(this.inputCost[i]), status: this.inputStatus[i],
+      category: this.inputCategory[i], author: this.inputAuthor[i], sale: Number(this.inputSale[i]), content: this.inputContent[i]}
     this.productService.postData(url, body).subscribe((res:any)=>{
-      this.dataBookManage = res
+      this.datasBook = res
     });
-    if(this.dataBookManage.length == 0){
-      this.isCheck = true;
-    }
-    else this.getAll(this.count)
   }
 
-  clickBook(book:Book){
+  clickBook(book:Book, i:number){
     this.book = book;
-    this.inputTitle = this.book.title ?? '';
-    this.inputCategory = this.book.category ?? '';
-    this.inputAuthor = this.book.author ?? '';
-    this.inputContent = this.book.content ?? '';
-    this.inputCost = (this.book.cost ?? 0).toString();
-    this.inputSale = (this.book.sale ?? 0).toString();
-    this.inputStatus = this.book.status ?? '';
+    this.inputTitle[i] = this.book.title ?? '';
+    this.inputCategory[i] = this.book.category ?? '';
+    this.inputAuthor[i] = this.book.author ?? '';
+    this.inputContent[i] = this.book.content ?? '';
+    this.inputCost[i] = (this.book.cost ?? 0).toString();
+    this.inputSale[i] = (this.book.sale ?? 0).toString();
+    this.inputStatus[i] = this.book.status ?? '';
   }
 
-  getAll(n:number){
-    if(this.data.messageFromManageStyle != undefined){
-      this.productService.getBookManageByRequest(this.data.messageFromManageStyle, this.count, 11).subscribe((res:any)=>{
-        this.datasBook = res
-      })
-    }
-    else {
-      this.productService.getAllBookManage(n, 11).subscribe((res:any)=>{
-        this.datasBook = res
-      })
-    }
+  clickBack(i:number){
+    this.inputTitle[i] = '';
+    this.inputCategory[i] = '';
+    this.inputAuthor[i] = '';
+    this.inputContent[i] = '';
+    this.inputCost[i] = '';
+    this.inputSale[i] = '';
+    this.inputStatus[i] = '';
   }
   clickSearch(){
     this.count = 0;
@@ -202,12 +199,63 @@ export class ManageBookComponent implements OnInit {
       this.datasBook = res
     })
   }
+
+  getAll(n:number){
+    if(this.isCheck == false){
+      if(this.data.messageFromManageStyle != undefined){
+        this.productService.getBookManageByRequest(this.data.messageFromManageStyle, n, 11).subscribe((res:any)=>{
+          this.datasBook = res
+        })
+      }
+      else {
+        this.productService.getAllBookManage(n, 11).subscribe((res:any)=>{
+          this.datasBook = res
+        })
+      }
+    }
+    else {
+      let category = '';
+      let author = '';
+      let status = '';
+      const url = 'http://localhost:8080/book/getSelectBook/' + n + '/11';
+      if(this.categoryName != 'Tất cả thể loại') category = this.categoryName;
+      if(this.authorName != 'Tất cả tác giả') author = this.authorName;
+      if(this.bookStatus != 'Tất cả trạng thái') status = this.bookStatus;
+      const body = {category: category, author: author, costStart: this.Min, costEnd: this.Max, status: status}
+      this.productService.postData(url, body).subscribe((res:any) => {
+        this.datasBook = res
+      })
+    }
+  }
   clickMore(){
-    if (this.datasBook.length==9){
-      this.count = this.count + 1;
-      this.datasCheckBook = this.datasBook;
-      this.getAll(this.count);
-      if(this.datasBook == undefined){
+    if (this.datasBook.length==11){
+      if(this.isCheck == false){
+        if(this.data.messageFromManageStyle != undefined){
+          this.productService.getBookManageByRequest(this.data.messageFromManageStyle, this.count + 1, 11).subscribe((res:any)=>{
+            this.datasCheckBook = res
+          })
+        }
+        else {
+          this.productService.getAllBookManage(this.count + 1, 11).subscribe((res:any)=>{
+            this.datasCheckBook = res
+          })
+        }
+      }
+      else {
+        let category = '';
+        let author = '';
+        let status = '';
+        const url = 'http://localhost:8080/book/getSelectBook/' + this.count + 1 + '/11';
+        if(this.categoryName != 'Tất cả thể loại') category = this.categoryName;
+        if(this.authorName != 'Tất cả tác giả') author = this.authorName;
+        if(this.bookStatus != 'Tất cả trạng thái') status = this.bookStatus;
+        const body = {category: category, author: author, costStart: this.Min, costEnd: this.Max, status: status}
+        this.productService.postData(url, body).subscribe((res:any) => {
+          this.datasCheckBook = res
+        })
+      }
+      if(this.datasCheckBook.length != 0){
+        this.count = this.count + 1;
         this.datasBook = this.datasCheckBook;
       }
     }
@@ -235,7 +283,9 @@ export class ManageBookComponent implements OnInit {
   clickManageBook(){
     this.count = 0;
     this.data.messageFromManageStyle = undefined;
-    this.getAll(this.count);
+    this.productService.getAllBookManage(this.count, 11).subscribe((res:any)=>{
+      this.datasBook = res
+    })
   }
 
   isSetting:any[]=[{status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}, {status: false}]
@@ -254,9 +304,53 @@ export class ManageBookComponent implements OnInit {
     }
   }
 
+  title = '';
+  category = '';
+  author = '';
+  content = '';
+  cost = '';
+  sale = '';
+  status = '';
+
+  saveNewBook(){
+    const url = 'http://localhost:8080/book/addNewBook'
+    const body = {bookId: 0, authorId: 0, title: this.title, cost: this.cost, content: this.content, status: this.status, sale: this.sale, category: this.category, author: this.author}
+    this.productService.postData(url, body).subscribe();
+    this.backSave();
+  }
+
+  backSave(){
+    this.title = '';
+    this.category = '';
+    this.author = '';
+    this.content = '';
+    this.cost = '';
+    this.sale = '';
+    this.status = '';
+  }
+
   changWeb(){
     return{
       'opacity':this.isNewBook ? '1':'0.2',
     }
+  }
+  selectBook(){
+    this.isCheck = true;
+    this.count = 0;
+    this.isClickStatusMore = false;
+    this.isClickCostMore = false;
+    this.isClickAuthorMore = false;
+    this.isClickCategoryMore = false;
+    let category = '';
+    let author = '';
+    let status = '';
+    const url = 'http://localhost:8080/book/getSelectBook/' + this.count + '/11';
+    if(this.categoryName != 'Tất cả thể loại') category = this.categoryName;
+    if(this.authorName != 'Tất cả tác giả') author = this.authorName;
+    if(this.bookStatus != 'Tất cả trạng thái') status = this.bookStatus;
+    const body = {category: category, author: author, costStart: this.Min, costEnd: this.Max, status: status}
+    this.productService.postData(url, body).subscribe((res:any) => {
+      this.datasBook = res
+    })
   }
 }

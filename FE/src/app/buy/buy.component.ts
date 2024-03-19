@@ -25,6 +25,7 @@ export class BuyComponent implements OnInit{
   isLogin1 = true;
   isLogin2 = false;
   logOut = false;
+  isClickBuy = false;
 
   constructor(private productService: ProductService,
               private route: ActivatedRoute,
@@ -113,10 +114,16 @@ export class BuyComponent implements OnInit{
   }
   clickSaveBuy(book:Book, cost:number){
     const url1 = 'http://localhost:8080/buy/addNewBuy';
-    const data1 = { bookStorageId: book.id, accountId: this.dataAccount?.cardNumber, status: 'Thanh toán khi nhận hàng', cost: cost};
+    const data1 = { bookStorageId: book.id, accountId: this.dataAccount?.cardNumber, status: 'Đơn hàng đang được người bán chuẩn bị', cost: cost};
     this.productService.postData(url1, data1).subscribe();
     const url2 = 'http://localhost:8080/notification/addNewNotification';
     const data2 = {mainContentId: 2, accountId: this.dataAccount?.cardNumber};
     this.productService.postData(url2, data2).subscribe();
+    this.isClickBuy = !this.isClickBuy;
+  }
+  changeMessBuy(){
+    return{
+      'display':this.isClickBuy ? 'block':'none',
+    }
   }
 }

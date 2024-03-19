@@ -1,5 +1,13 @@
+<div style="width: 16%; height: 100%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0; top: 0; padding-top: 6%; text-align: center" [ngStyle]="changWeb()">
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+  <a><h3 style="color: red;" (click)="clickManageMess()">Quản lý thông báo</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
+  <a><h3>Quản lý doanh thu</h3></a><br>
+</div>
 <div id="body">
-  <div id = "Head">
+  <div id = "Head" [ngStyle]="changWeb()">
     <div id = "name">
       <p style="color: #F78DA7; width: auto;">TCC</p>
       <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
@@ -7,21 +15,22 @@
     <div id = "categori">
       <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm thông báo">
       <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
-      <button style="color: #d35810; padding-left: 3.4rem" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <button style="color: #d35810; padding-left: 3.4rem; float: right" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <div style="width: 12%; height: auto; position: absolute; top: 90%; right: 0; transform: translateY(-10%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 10;" [ngStyle]="changeLogout()">
+        <div id = "setting">Cài đặt</div><br>
+        <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+      </div>
     </div>
   </div>
-  <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
-  <div style="width: 16%; height: 100%; background-color: white; position: absolute; top: 3%; left: 22%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0px; top: 0%; padding-top: 6%;">
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
-    <a><h3 style="color: red;" (click)="clickManageMess()">Quản lý thông báo</h3></a><br>
-    <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'"><h3>Quản lý thể loại</h3></a><br>
-    <a><h3>Quản lý doanh thu</h3></a><br>
+  <div id="search" [ngStyle]="changWeb()">
+    <div style="position: absolute; top: 50%; transform: translateY(-50%); left: 0; width: 80%;">
+      <h3 style="position: absolute; top: 50%; transform: translateY(-50%); left: 0">Thời gian gửi:</h3>
+      <input [(ngModel)]="start" style="position: absolute; left: 40%; transform: translateX(-60%)" type="text" placeholder="Ngày đầu">
+      <input [(ngModel)]="end" style="float: right" type="text" placeholder="Ngày cuối">
+    </div>
+    <button style="background-color: #ED2874; color: white; width: 10%; height: 50%; padding: 0.5%; position: absolute; top: 50%; right: 0; transform: translateY(-50%)" (click)="selectMess()">Tìm kiếm</button>
   </div>
-  <div id = "nav">
-    <button style="color: #F78DA7; margin-bottom: 2%; float: right;"  (click)="clickMore()"><h3>Xem thêm ></h3></button>
-    <button style="color: #F78DA7; margin-bottom: 2%; float: left;"  (click)="clickLast()"><h3>< Quay lại</h3></button>
+  <div id = "nav" [ngStyle]="changWeb()">
     <table>
       <tr>
         <th>Email nhận</th>
@@ -29,13 +38,15 @@
         <th>Nội dung thông báo</th>
         <th>Thời gian gửi</th>
       </tr>
-      <tr *ngFor="let item of datasMess">
-        <td><input type="text" value="{{item.email}}"></td>
-        <td><input type="text" value="{{item.type}}"></td>
-        <td><input type="text" value="{{item.content}}"></td>
-        <td><input type="text" value="{{item.sent}}"></td>
+      <tr *ngFor="let item of datasMess, let i = index">
+        <td><p>{{item.email}}</p></td>
+        <td><p>{{item.type}}</p></td>
+        <td><p>{{item.content}}</p></td>
+        <td><p>{{item.sent}}</p></td>
       </tr>
     </table>
+    <button style="color: #F78DA7; position: absolute; right: 0; bottom: 8%"  (click)="clickMore()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; position: absolute; left: 0; bottom: 8%"  (click)="clickLast()"><h3>< Quay lại</h3></button>
     <div id="button">
       <button id="save" (click)="clickSend()">Gửi thông báo</button>
     </div>

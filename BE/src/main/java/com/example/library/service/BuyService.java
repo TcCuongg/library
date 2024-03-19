@@ -38,6 +38,7 @@ public class BuyService {
         buy.setStatus(status);
         buy.setTime(LocalDateTime.now());
         buy.setBookStorageToBuy(bookStorage);
+        buyRepository.save(buy);
 
         account.getBuysFromAccount().add(buy);
         account.setBuysFromAccount(account.getBuysFromAccount());
@@ -49,6 +50,6 @@ public class BuyService {
 
         redisBuyTemplate.delete("findAllBookByAccountBuy:" + accountId + "(" + getCountAllBookByAccountBuy/8 + ", " + 8 + ")");
 
-        return buyRepository.save(buy);
+        return buy;
     }
 }
