@@ -4,7 +4,7 @@ import {map, Observable, of} from 'rxjs';
 import {Account, Book, Category, Mess, Storage} from '../app/app.module';
 
 const httpOptions ={
-  headers:new HttpHeaders({'Content-Type':'Application/json'})
+  headers:new HttpHeaders({'Content-Type': 'application/octet-stream'})
 }
 
 @Injectable({
@@ -48,6 +48,10 @@ export class ProductService {
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByStorage/' + storageId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
     )
   }
+  getBookRemainsZero(storageId:number, count:number, size:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookRemainsZero/' + storageId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
+    )
+  }
   getBookByStorageAndRequest(storageId:number, request:string, count:number, size:number){
     return this.httpClient.get<Book[]>('http://localhost:8080/storage/getBookByStorageAndRequest/' + storageId.toString() + '/' + request + '/' + count.toString() + '/' + size.toString()).pipe(
     )
@@ -73,6 +77,9 @@ export class ProductService {
     return this.httpClient.get<Account[]>('http://localhost:8080/account/getAllAccount/' + count.toString() + '/' + step.toString()).pipe(
     )
   }
+  getAllAccountStatus(){
+    return this.httpClient.get<string[]>('http://localhost:8080/account/findAllAccountStatus').pipe()
+  }
 
 
   //Category
@@ -95,6 +102,9 @@ export class ProductService {
   getStorageByRequest(request:string, count:number, size:number){
     return this.httpClient.get<Storage[]>('http://localhost:8080/storage/getStorageByRequest/' + request + '/' + count.toString() + '/' + size.toString()).pipe(
     )
+  }
+  getStorageByStatus(status:string, count:number, size:number){
+    return this.httpClient.get<Storage[]>('http://localhost:8080/storage/findStorageByStatus/'+status+'/'+count.toString()+'/'+size.toString()).pipe()
   }
 
 
@@ -121,6 +131,35 @@ export class ProductService {
   getAllAuthorName(){
     return this.httpClient.get<string[]>('http://localhost:8080/author/getAllAuthorName').pipe(
     )
+  }
+
+  //get count page
+  getAllCountPage(){
+    return this.httpClient.get<number>('http://localhost:8080/account/getCountAllAccount').pipe()
+  }
+  getCountAllBookPageByRequest(request:string){
+    return this.httpClient.get<number>('http://localhost:8080/book/findCountAllBookManageRequest/' + request).pipe()
+  }
+  getCountAllBookManage(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookManage').pipe()
+  }
+  getCountAllStorage(){
+    return this.httpClient.get<number>('http://localhost:8080/storage/getCountAllStorage').pipe()
+  }
+  getCountAllStorageByRequest(request:string){
+    return this.httpClient.get<number>('http://localhost:8080/storage/getCountAllStorageByRequest/' + request).pipe()
+  }
+  getCountBookByStorage(id:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookByStorage/'+id.toString()).pipe()
+  }
+  getCountAllBookByStorageAndRequest(id:number, request:string){
+    return this.httpClient.get<number>('http://localhost:8080/storage/getCountAllBookByStorageAndRequest/'+id.toString()+'/'+request).pipe()
+  }
+  getCountBookRemainsZero(id:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookRemainsZero/'+id.toString()).pipe()
+  }
+  getCountCategories(){
+    return this.httpClient.get<number>('http://localhost:8080/category/getCountCategories').pipe()
   }
 
 

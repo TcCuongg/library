@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class StorageService {
@@ -39,6 +40,8 @@ public class StorageService {
     private RedisTemplate redisStorageTemplate;
     @Autowired
     private RedisTemplate redisBookMoreTemplate;
+    @Autowired
+    private BookStorageService bookStorageService;
     @Autowired
     private BookService bookService;
 
@@ -169,130 +172,268 @@ public class StorageService {
 //            return bookRepository.getAllBookByStorageAndAuthor(Long.parseLong(storageId), request, pageable);
         }
     }
+    public List<Storage> findStorageByStatus(String status, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return storageRepository.findStorageByStatus(status, pageable);
+    }
 
 
 
     public List<Storage> addNewStorage(Storage storage, int count, int size){
-        storageRepository.save(storage);
-        Pageable pageable = PageRequest.of(count, size);
-        redisStorageTemplate.delete("getAllStorage" + "(" + count + ", " + size + ")");
-        redisStorageTemplate.delete("getAllStorageByRequest:" + storage.getLocation() + "(*");
-        redisStorageTemplate.delete("getAllStorageByRequest:" + storage.getPhone() + "(*");
-        redisStorageTemplate.delete("getAllBookByStorageAndRequest:" + storage.getId() + "*");
-        return storageRepository.findAllStorage(pageable);
+        List<Storage> storageList = new ArrayList<>();
+        if(storage.getLocation() != "" && storage.getPhone().toString() != ""){
+            storageRepository.save(storage);
+            storageList.add(storageRepository.findFirstByOrderByIdDesc());
+            redisStorageTemplate.delete("getAllStorage" + "(" + (count - 1) + ", " + size + ")");
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllStorageByRequest:" + storage.getLocation() + "(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllStorageByRequest:" + storage.getPhone() + "(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBookByStorageAndRequest:" + storage.getId() + "*"));
+            return storageList;
+        }
+        return storageList;
     }
     public List<Storage> updateStorage(Long storageId, String status, int count, int size){
-        Storage storage = storageRepository.findFirstById(storageId);
-        storage.setStatus(status);
-        storageRepository.save(storage);
-        Pageable pageable = PageRequest.of(count, size);
-        redisStorageTemplate.delete("getAllBookByStorageAndRequest:" + storage.getId() + "*");
-        List<Long> findAllBookStorageId = storageRepository.findAllBookStorageId();
-        for(int i = 0; i < findAllBookStorageId.size(); i++){
-            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByBookStorageId:" + findAllBookStorageId.get(i)));
+        List<Storage> storageList = new ArrayList<>();
+        if(Objects.equals(status, "Đóng cửa") || Objects.equals(status, "Mở cửa")){
+            Storage storage = storageRepository.findFirstById(storageId);
+            storage.setStatus(status);
+            storageRepository.save(storage);
+            storageList.add(storage);
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBookByStorageAndRequest:" + storage.getId() + "*"));
+            List<Long> findAllBookStorageId = storageRepository.findAllBookStorageId();
+            for(int i = 0; i < findAllBookStorageId.size(); i++){
+                redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByBookStorageId:" + findAllBookStorageId.get(i)));
+            }
+            redisStorageTemplate.delete("getBookByStorage:" + storageId);
+            redisStorageTemplate.delete("getAllStorage(" + count + ", " + size + ")");
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBook(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookFollowDesc(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByTitle:*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByCategory:*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookByRequest:*"));
+            return storageList;
         }
-        redisStorageTemplate.delete("getBookByStorage:" + storageId);
-        redisStorageTemplate.delete("getAllBook(*");
-        redisStorageTemplate.delete("getBookFollowDesc(*");
-        redisStorageTemplate.delete("getBookByTitle:*");
-        redisStorageTemplate.delete("getBookByCategory:*");
-        redisStorageTemplate.delete("findAllBookByRequest:*");
-        return storageRepository.findAllStorage(pageable);
+        return storageList;
     }
 
-    public List<BookMore> addNewBookOnStorage(Long accountId, Long storageId, List<BookListSave> bookListSaveList){
-        for(int i = 0; i < bookListSaveList.size(); i++){
-            Book book = bookRepository.findFirstByTitle(bookListSaveList.get(i).getTitle());
-            Author author = authorRepository.findFirstByName(bookListSaveList.get(i).getAuthor());
-            Category category = categoryRepository.findFirstByName(bookListSaveList.get(i).getCategory());
-            Storage storage = storageRepository.findFirstById(storageId);
-            Account account = accountRepository.findFirstByCardNumber(accountId);
-            if(author != null && category != null){
-                if(book == null){
-                    Book book1 = new Book();
-                    book1.setCategoryToBook(category);
-                    book1.setTitle(bookListSaveList.get(i).getTitle());
-                    book1.setFollow(0L);
-                    book1.setCost(Long.parseLong(bookListSaveList.get(i).getCost()));
-                    book1.setContent(bookListSaveList.get(i).getContent());
-                    book1.setStatus("Đang bán");
-                    book1.setSale(0);
-                    bookRepository.save(book1);
+    public List<BookMore> addNewBookOnStorage(Long storageId, Long accountId, BookListSave bookListSave, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        Book book = bookRepository.findFirstByTitle(bookListSave.getTitle());
+        Author author = authorRepository.findFirstByName(bookListSave.getAuthor());
+        Category category = categoryRepository.findFirstByName(bookListSave.getCategory());
+        Storage storage = storageRepository.findFirstById(storageId);
+        Account account = accountRepository.findFirstByCardNumber(accountId);
+        if(author != null && category != null){
+            if(book == null){
+                Book book1 = new Book();
+                book1.setCategoryToBook(category);
+                book1.setTitle(bookListSave.getTitle());
+                book1.setFollow(0L);
+                book1.setCost(Long.parseLong(bookListSave.getCost()));
+                book1.setContent(bookListSave.getContent());
+                book1.setStatus("Đang bán");
+                book1.setSale(0);
+                bookRepository.save(book1);
 
-                    book1 = bookRepository.findFirstByOrderByIdDesc();
+                book1 = bookRepository.findFirstByOrderByIdDesc();
 
-                    AuthorBook authorBook = new AuthorBook();
-                    authorBook.setAuthorToAuthorBook(author);
-                    authorBook.setBookToAuthorBook(book1);
-                    authorBookRepository.save(authorBook);
+                AuthorBook authorBook = new AuthorBook();
+                authorBook.setAuthorToAuthorBook(author);
+                authorBook.setBookToAuthorBook(book1);
+                authorBookRepository.save(authorBook);
 
-                    author.getAuthorBooksFromAuthor().add(authorBook);
-                    author.setAuthorBooksFromAuthor(author.getAuthorBooksFromAuthor());
-                    authorRepository.save(author);
+                author.getAuthorBooksFromAuthor().add(authorBook);
+                author.setAuthorBooksFromAuthor(author.getAuthorBooksFromAuthor());
+                authorRepository.save(author);
 
-                    BookStorage bookStorage = new BookStorage();
-                    bookStorage.setBookToBookStorage(book1);
-                    bookStorage.setStorageToBookStorage(storage);
-                    bookStorage.setQuantity(Integer.parseInt(bookListSaveList.get(i).getQuantity()));
-                    bookStorage.setImportTime(LocalDateTime.now());
-                    bookStorage.setImage(bookListSaveList.get(i).getImage());
-                    bookStorage.setAccountToBookStorage(account);
-                    bookStorageRepository.save(bookStorage);
+                BookStorage bookStorage = new BookStorage();
+                bookStorage.setBookToBookStorage(book1);
+                bookStorage.setStorageToBookStorage(storage);
+                bookStorage.setQuantity(Integer.parseInt(bookListSave.getQuantity()));
+                bookStorage.setImportTime(LocalDateTime.now());
+                bookStorage.setImage(bookListSave.getImage());
+                bookStorage.setAccountToBookStorage(account);
+                bookStorageRepository.save(bookStorage);
 
-                    account.getBookStoragesFromAccount().add(bookStorage);
-                    account.setBookStoragesFromAccount(account.getBookStoragesFromAccount());
-                    accountRepository.save(account);
+                account.getBookStoragesFromAccount().add(bookStorage);
+                account.setBookStoragesFromAccount(account.getBookStoragesFromAccount());
+                accountRepository.save(account);
 
-                    book1.getAuthorBooksFromBook().add(authorBook);
-                    book1.setAuthorBooksFromBook(book1.getAuthorBooksFromBook());
-                    book1.getBookStoragesFromBook().add(bookStorage);
-                    book1.setBookStoragesFromBook(book1.getBookStoragesFromBook());
-                    bookRepository.save(book1);
+                book1.getAuthorBooksFromBook().add(authorBook);
+                book1.setAuthorBooksFromBook(book1.getAuthorBooksFromBook());
+                book1.getBookStoragesFromBook().add(bookStorage);
+                book1.setBookStoragesFromBook(book1.getBookStoragesFromBook());
+                bookRepository.save(book1);
 
-                    category.getBooksFromCategory().add(book1);
-                    category.setBooksFromCategory(category.getBooksFromCategory());
-                    categoryRepository.save(category);
+                category.getBooksFromCategory().add(book1);
+                category.setBooksFromCategory(category.getBooksFromCategory());
+                categoryRepository.save(category);
 
-                    storage.getBookStoragesFromStorage().add(bookStorage);
-                    storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
-                    storageRepository.save(storage);
-
-                    redisStorageTemplate.delete("getAllBookByStorageAndRequest:" + storage.getId() + "*");
-                    redisStorageTemplate.delete("getBookByStorage:" + storageId);
-                    redisStorageTemplate.delete("getAllBook(*");
-                    redisStorageTemplate.delete("getBookFollowDesc(*");
-                    redisStorageTemplate.delete("getBookByTitle:*");
-                    redisStorageTemplate.delete("getBookByCategory:*");
-                    redisStorageTemplate.delete("findAllBookByRequest:*");
-                }
-                else if(getAllBookByStorageAndRequest(storageId.toString(), book.getTitle(), 0, 11).isEmpty()){
-                    BookStorage bookStorage = new BookStorage();
-                    bookStorage.setBookToBookStorage(book);
-                    bookStorage.setStorageToBookStorage(storage);
-                    bookStorage.setQuantity(Integer.parseInt(bookListSaveList.get(i).getQuantity()));
-                    bookStorage.setImportTime(LocalDateTime.now());
-                    bookStorage.setImage(bookListSaveList.get(i).getImage());
-                    bookStorage.setAccountToBookStorage(account);
-                    bookStorageRepository.save(bookStorage);
-
-                    book.getBookStoragesFromBook().add(bookStorage);
-                    book.setBookStoragesFromBook(book.getBookStoragesFromBook());
-                    bookRepository.save(book);
-
-                    storage.getBookStoragesFromStorage().add(bookStorage);
-                    storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
-                    storageRepository.save(storage);
-
-                    redisStorageTemplate.delete("getAllBookByStorageAndRequest:" + storage.getId() + "*");
-                    redisStorageTemplate.delete("getBookByStorage:" + storageId);
-                    redisStorageTemplate.delete("getAllBook(*");
-                    redisStorageTemplate.delete("getBookFollowDesc(*");
-                    redisStorageTemplate.delete("getBookByTitle:*");
-                    redisStorageTemplate.delete("getBookByCategory:*");
-                    redisStorageTemplate.delete("findAllBookByRequest:*");
-                }
+                storage.getBookStoragesFromStorage().add(bookStorage);
+                storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
+                storageRepository.save(storage);
             }
+            else if(getAllBookByStorageAndRequest(storageId.toString(), book.getTitle(), 0, Integer.MAX_VALUE).isEmpty()){
+                BookStorage bookStorage = new BookStorage();
+                bookStorage.setBookToBookStorage(book);
+                bookStorage.setStorageToBookStorage(storage);
+                bookStorage.setQuantity(Integer.parseInt(bookListSave.getQuantity()));
+                bookStorage.setImportTime(LocalDateTime.now());
+                bookStorage.setImage(bookListSave.getImage());
+                bookStorage.setAccountToBookStorage(account);
+                bookStorageRepository.save(bookStorage);
+
+                book.getBookStoragesFromBook().add(bookStorage);
+                book.setBookStoragesFromBook(book.getBookStoragesFromBook());
+                book.setStatus("Đang bán");
+                bookRepository.save(book);
+
+                storage.getBookStoragesFromStorage().add(bookStorage);
+                storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
+                storageRepository.save(storage);
+            }
+            else {
+                BookStorage bookStorage = bookStorageRepository.findFirstById(bookStorageRepository.findFirstByStorageToBookStorageAndBookToBookStorage(storage, book).getId());
+                bookStorage.setImage(bookListSave.getImage());
+                bookStorage.setImportTime(LocalDateTime.now());
+                bookStorage.setAccountToBookStorage(account);
+                int checkQuantity = bookStorage.getQuantity();
+                if(checkQuantity != 0) checkQuantity += Integer.parseInt(bookListSave.getQuantity());
+                bookStorage.setQuantity(checkQuantity);
+                bookStorageRepository.save(bookStorage);
+
+                book.setStatus("Đang bán");
+                bookRepository.save(book);
+            }
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBookByStorageAndRequest:" + storage.getId() + "*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByStorage:" + storageId.toString() + "(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBook(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookFollowDesc(*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByTitle:*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByCategory:*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookByRequest:*"));
+            return bookRepository.getBookByStorageId(storageId, pageable);
         }
-        return bookService.getBookByStorage(storageId, 0, 11);
+        return null;
+    }
+
+    public int getCountAllStorage(){
+        return storageRepository.getCountAllStorage();
+    }
+
+    public int getCountAllStorageByRequest(String request){
+        if(storageRepository.countStorageByLocation(request) > 0){
+            return storageRepository.countStorageByLocation(request);
+        }else {
+            return storageRepository.countStorageByPhone(Long.parseLong(request));
+        }
+    }
+
+//    public List<BookMore> addNewBookOnStorage(Long accountId, Long storageId, List<BookListSave> bookListSaveList){
+//        for(int i = 0; i < bookListSaveList.size(); i++){
+//            Book book = bookRepository.findFirstByTitle(bookListSaveList.get(i).getTitle());
+//            Author author = authorRepository.findFirstByName(bookListSaveList.get(i).getAuthor());
+//            Category category = categoryRepository.findFirstByName(bookListSaveList.get(i).getCategory());
+//            Storage storage = storageRepository.findFirstById(storageId);
+//            Account account = accountRepository.findFirstByCardNumber(accountId);
+//            if(author != null && category != null){
+//                if(book == null){
+//                    Book book1 = new Book();
+//                    book1.setCategoryToBook(category);
+//                    book1.setTitle(bookListSaveList.get(i).getTitle());
+//                    book1.setFollow(0L);
+//                    book1.setCost(Long.parseLong(bookListSaveList.get(i).getCost()));
+//                    book1.setContent(bookListSaveList.get(i).getContent());
+//                    book1.setStatus("Đang bán");
+//                    book1.setSale(0);
+//                    bookRepository.save(book1);
+//
+//                    book1 = bookRepository.findFirstByOrderByIdDesc();
+//
+//                    AuthorBook authorBook = new AuthorBook();
+//                    authorBook.setAuthorToAuthorBook(author);
+//                    authorBook.setBookToAuthorBook(book1);
+//                    authorBookRepository.save(authorBook);
+//
+//                    author.getAuthorBooksFromAuthor().add(authorBook);
+//                    author.setAuthorBooksFromAuthor(author.getAuthorBooksFromAuthor());
+//                    authorRepository.save(author);
+//
+//                    BookStorage bookStorage = new BookStorage();
+//                    bookStorage.setBookToBookStorage(book1);
+//                    bookStorage.setStorageToBookStorage(storage);
+//                    bookStorage.setQuantity(Integer.parseInt(bookListSaveList.get(i).getQuantity()));
+//                    bookStorage.setImportTime(LocalDateTime.now());
+//                    bookStorage.setImage(bookListSaveList.get(i).getImage());
+//                    bookStorage.setAccountToBookStorage(account);
+//                    bookStorageRepository.save(bookStorage);
+//
+//                    account.getBookStoragesFromAccount().add(bookStorage);
+//                    account.setBookStoragesFromAccount(account.getBookStoragesFromAccount());
+//                    accountRepository.save(account);
+//
+//                    book1.getAuthorBooksFromBook().add(authorBook);
+//                    book1.setAuthorBooksFromBook(book1.getAuthorBooksFromBook());
+//                    book1.getBookStoragesFromBook().add(bookStorage);
+//                    book1.setBookStoragesFromBook(book1.getBookStoragesFromBook());
+//                    bookRepository.save(book1);
+//
+//                    category.getBooksFromCategory().add(book1);
+//                    category.setBooksFromCategory(category.getBooksFromCategory());
+//                    categoryRepository.save(category);
+//
+//                    storage.getBookStoragesFromStorage().add(bookStorage);
+//                    storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
+//                    storageRepository.save(storage);
+//
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBookByStorageAndRequest:" + storage.getId() + "*"));
+//                    redisStorageTemplate.delete("getBookByStorage:" + storageId);
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBook(*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookFollowDesc(*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByTitle:*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByCategory:*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookByRequest:*"));
+//                }
+//                else if(getAllBookByStorageAndRequest(storageId.toString(), book.getTitle(), 0, 11).isEmpty()){
+//                    BookStorage bookStorage = new BookStorage();
+//                    bookStorage.setBookToBookStorage(book);
+//                    bookStorage.setStorageToBookStorage(storage);
+//                    bookStorage.setQuantity(Integer.parseInt(bookListSaveList.get(i).getQuantity()));
+//                    bookStorage.setImportTime(LocalDateTime.now());
+//                    bookStorage.setImage(bookListSaveList.get(i).getImage());
+//                    bookStorage.setAccountToBookStorage(account);
+//                    bookStorageRepository.save(bookStorage);
+//
+//                    book.getBookStoragesFromBook().add(bookStorage);
+//                    book.setBookStoragesFromBook(book.getBookStoragesFromBook());
+//                    bookRepository.save(book);
+//
+//                    storage.getBookStoragesFromStorage().add(bookStorage);
+//                    storage.setBookStoragesFromStorage(storage.getBookStoragesFromStorage());
+//                    storageRepository.save(storage);
+//
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBookByStorageAndRequest:" + storage.getId() + "*"));
+//                    redisStorageTemplate.delete("getBookByStorage:" + storageId);
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getAllBook(*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookFollowDesc(*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByTitle:*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByCategory:*"));
+//                    redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookByRequest:*"));
+//                }
+//            }
+//        }
+//        return bookService.getBookByStorage(storageId, 0, 11);
+//    }
+
+    public int getCountAllBookByStorageAndRequest(String storageId, String request){
+        if(bookRepository.getCountAllBookByStorageAndTitle(Long.parseLong(storageId), request) > 0){
+            return bookRepository.getCountAllBookByStorageAndTitle(Long.parseLong(storageId),request);
+        }
+        if(bookRepository.getCountAllBookByStorageAndCategory(Long.parseLong(storageId), request) > 0){
+            return bookRepository.getCountAllBookByStorageAndCategory(Long.parseLong(storageId), request);
+        }
+        else{
+            return bookRepository.getCountAllBookByStorageAndAuthor(Long.parseLong(storageId), request);
+        }
     }
 }

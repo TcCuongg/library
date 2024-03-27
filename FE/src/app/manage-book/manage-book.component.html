@@ -60,7 +60,7 @@
     <div>
       <p style="float:left; margin-left: 4%">Giá thấp nhất:</p><br><br>
       <input [(ngModel)]="Min" style="box-shadow: 0.1rem 0.1rem 0.2rem 0.2rem #8d8a8a; margin-left: 5%; width: 89%;" type="text" placeholder="Min"><br>
-      <p style="float:left; margin-left: 4%; margin-top: 2%">Giá cao nhất</p><br><br>
+      <p style="float:left; margin-left: 4%; margin-top: 2%">Giá cao nhất:</p><br><br>
       <input [(ngModel)]="Max" style="box-shadow: 0.1rem 0.1rem 0.2rem 0.2rem #8d8a8a; margin-left: 5%; width: 89%;" type="text" placeholder="Max"><br>
     </div>
   </div>
@@ -83,68 +83,87 @@
         <th>Trạng thái</th>
         <th>Cài đặt</th>
       </tr>
-      <tr *ngFor="let item of datasBook, let i = index" (click)="clickBook(item, i)">
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].title}}</p>
-          <input [(ngModel)]="inputTitle[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].category}}</p>
-          <input [(ngModel)]="inputCategory[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].author}}</p>
-          <input  [(ngModel)]="inputAuthor[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].content}}</p>
-          <input [(ngModel)]="inputContent[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].cost}}</p>
-          <input [(ngModel)]="inputCost[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].sale}}</p>
-          <input [(ngModel)]="inputSale[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <p style="display:block;" [ngStyle]="{'display': isSetting[i].status ?  'none' : 'block'}">{{datasBook[i].status}}</p>
-          <input [(ngModel)]="inputStatus[i]" [ngStyle]="{'display': isSetting[i].status ?  'block' : 'none'}" style="display:none;" type="text">
-        </td>
-        <td>
-          <button (click)="changeText(i)" style="width: 100%; height: 100%; padding: 11% 8.5%; color: white; background-color: #2884ea" [ngStyle]="{'display': isSetting[i].status ? 'none' : 'block'}">Sửa</button>
-          <button (click)="changeText(i); changeBook(i)" style="width: 49.9%; height: 100%; padding: 11% 8.5%; color: white; background-color: red; float: left" [ngStyle]="{'display': isSetting[i].status ? 'block' : 'none'}" >Lưu</button>
-          <button (click)="changeText(i); clickBack(i)" style="width: 49.9%; height: 100%; padding: 11% 8.5%; color: white; background-color: #2884ea" [ngStyle]="{'display': isSetting[i].status ? 'block' : 'none'}">Bỏ</button>
+      <tr *ngFor="let item of datasBook">
+        <td style="width: 16%">{{item.title}}</td>
+        <td style="width: 12%">{{item.category}}</td>
+        <td style="width: 12%">{{item.author}}</td>
+        <td style="width: 30%">{{item.content}}</td>
+        <td style="width: 8%">{{item.cost}}</td>
+        <td style="width: 8%">{{item.sale}}</td>
+        <td style="width: 8%">{{item.status}}</td>
+        <td style="background-color: #2884ea; width: 6%">
+          <button style="width: 100%; height: 100%; padding: 11% 8.5%; color: white; background-color: #2884ea" (click)="clickBook(item); isBoxInput = true; isClickSetBook = true; isClickAddBook = false">Sửa</button>
         </td>
       </tr>
     </table>
   </div>
-  <button style="color: #F78DA7; position: absolute; bottom: 12%; right: 5%" (click)="clickMore()"><h3>Xem thêm ></h3></button>
-  <button style="color: #F78DA7; position: absolute; bottom: 12%; left: 5%" (click)="clickLast()"><h3>< Quay lại</h3></button>
-  <button (click)="clickNewBook()" style="background-color: #ED2874; color: white; width: 10%; height: 5%; padding: 0.5%; position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%)">Thêm sách</button>
-  <div id = "footer" [ngStyle]="changNewBook()">
-    <table>
-      <tr style="color: black">
-        <th>Tên sách</th>
-        <th>Thể loại</th>
-        <th>Tác giả </th>
-        <th>Nội dung</th>
-        <th>Giá bán</th>
-        <th>Giảm giá</th>
-        <th>Trạng thái</th>
-      </tr>
-      <tr>
-        <td><input [(ngModel)]="title" type="text" placeholder="Nhập tên sách"></td>
-        <td><input [(ngModel)]="category" type="text" placeholder="Nhập thể loại"></td>
-        <td><input [(ngModel)]="author" type="text" placeholder="Nhập tác giả"></td>
-        <td><input [(ngModel)]="content" type="text" placeholder="Nhập nội dung"></td>
-        <td><input [(ngModel)]="cost" type="text" placeholder="Nhập giá bán"></td>
-        <td><input [(ngModel)]="sale" type="text" placeholder="Nhập giảm giá"></td>
-        <td><input [(ngModel)]="status" type="text" placeholder="Nhập trạng thái"></td>
-      </tr>
-    </table>
-    <button id="save" (click)="clickNewBook(); saveNewBook()">Lưu</button>
-    <button id="out" (click)="clickNewBook(); backSave()">Bỏ</button>
+  <button style="color: #F78DA7; position: absolute; bottom: 12%; right: 5%" (click)="clickMore()" [ngStyle]="changWeb()"><h3>Xem thêm ></h3></button>
+  <button style="color: #F78DA7; position: absolute; bottom: 12%; left: 5%" (click)="clickLast()" [ngStyle]="changWeb()"><h3>< Quay lại</h3></button>
+  <ul class="pagination">
+    <li (click)="selectPage(1)"  [class.active]="count === 0">Trang đầu</li>
+    <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
+      {{ page }}
+    </li>
+    <li *ngIf="count < totalPages - 3">...</li>
+    <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{ totalPages }}</li>
+  </ul>
+  <button (click)="isBoxInput = true; isClickAddBook = true; isClickSetBook = false; backSave()" style="background-color: #ED2874; color: white; width: 10%; height: 5%; padding: 0.5%; position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%)" [ngStyle]="changWeb()">Thêm sách</button>
+  <div id = "newBook" [ngStyle]="changeSetBook()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickBack()">
+    <h2 style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem" [ngStyle]="{'display':isClickAddBook?'block':'none'}">Đăng ký tài khoản mới</h2>
+    <h2 style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem" [ngStyle]="{'display':isClickSetBook?'block':'none'}">Sửa thông tin sách</h2><br><br><br>
+
+    <div id = "selectCategory" [ngStyle]="changeHeight()">
+      <h3 style="float: left">Thể loại: </h3>
+      <input [(ngModel)]="category" style="float:left; width: 50%; height: 1.2rem; border-style: solid; border-color: #a4a4a4" type="text" placeholder="Thể loại sách">
+      <img style="width: 6%; transform: rotate(90deg); float: right" alt="error" src="assets/icon/More.svg" (click)="clickMoreSelectCategory()">
+      <div id = "moreSelectCategory" [ngStyle]="changeMoreSelectCategory()">
+        <p></p><br>
+        <div *ngFor="let item of dataCategory">
+          <h3 style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" (click)="clickSelectCategory(item); clickMoreSelectCategory()">{{item}}</h3><br>
+        </div>
+      </div>
+    </div><br><br>
+
+    <div id = "selectAuthor">
+      <h3 style="float: left">Tác giả:</h3>
+      <input [(ngModel)]="author" style="float:left; width: 50%; height: 12%; border-style: solid; border-color: #a4a4a4" type="text" placeholder="Tác giả">
+      <img  style="width: 6%; transform: rotate(90deg); float: right" alt="error" src="assets/icon/More.svg" (click)="clickMoreSelectAuthor()">
+      <div id = "moreSelectAuthor" [ngStyle]="changeMoreSelectAuthor()">
+        <p></p><br>
+        <div *ngFor="let item of dataAuthor">
+          <h3 style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" (click)="clickSelectAuthor(item); clickMoreSelectAuthor()">{{item}}</h3><br>
+        </div>
+      </div>
+    </div><br>
+
+    <h3 style="float: left">Trạng thái:</h3>
+    <select style="margin-left: 2%" (change)="optionStatus($event)">
+      <option value="Chọn thể loại" selected>{{status}}</option>
+      <option *ngFor="let country of dataStatus" [value]="country">{{ country }}</option>
+    </select><br><br><br>
+
+    <h3>Tên sách</h3>
+    <input [(ngModel)]="title" type="text" placeholder="Tên sách">
+    <h3>Nội dung</h3>
+    <input [(ngModel)]="content" type="text" placeholder="Nội dung">
+    <div style="width: 40%; float: left; margin-left: 5%; position: relative">
+      <h3 style="left: 0; position: absolute; top: 50%; transform: translateY(-50%)">Giá bán: </h3>
+      <input style="float: right; width: 50%; height: 2rem; align-items: center; border-style: solid; border-color: #a4a4a4;" [(ngModel)]="cost" type="text" placeholder="Giá bán">
+    </div>
+    <div style="width: 40%; float: right; margin-right: 5%; position: relative">
+      <h3 style="left: 0; position: absolute; top: 50%; transform: translateY(-50%)">Giảm giá: </h3>
+      <input style="float: right; width: 50%; height: 2rem; align-items: center; border-style: solid; border-color: #a4a4a4;" [(ngModel)]="sale" type="text" placeholder="Giảm giá">
+    </div>
+    <div style="width: 40%; height: 8%; position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%)">
+      <button style="float: left; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="changeBook(); clickBack()" [ngStyle]="{'display':isClickSetBook?'block':'none'}">Lưu</button>
+      <button style="float: left; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="saveNewBook(); clickBack()" [ngStyle]="{'display':isClickAddBook?'block':'none'}">Thêm</button>
+      <button style="float: right; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="clickBack()">Bỏ</button>
+    </div>
+  </div>
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
   </div>
 </div>

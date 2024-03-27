@@ -23,34 +23,50 @@
     </div>
   </div>
   <div id = "nav">
-    <button style="color: #F78DA7; margin-bottom: 2%; float: right;" (click)="clickMorefirst()"><h3>Xem thêm ></h3></button>
-    <button style="color: #F78DA7; margin-bottom: 2%; float: left;" (click)="clickLast()"><h3>< Quay lại</h3></button>
-    <div style="display: grid; grid-template-columns: 50% 50%; width: 100%; height: 80%; margin-top: 6%">
+    <div style="display: grid; grid-template-columns: 50% 50%; width: 100%; height: 70%; margin-top: 6%">
       <div class="storage" *ngFor="let item of dataCategory">
         <div>
           <h1 (click)="sendContentCategory(item)">{{item.name}}</h1>
           <br>
           <h2 style="float: left;">Khuyến mãi:</h2>
-          <input #input type="text" name="sale" [placeholder]="item.sale" style="font-size: large; font-weight: 600; margin-top: 1.5%; color: #7a7979; float: left; width: 14%">
+          <input #input type="text" name="sale" [placeholder]="item.sale" style="font-size: large; font-weight: 600; margin-top: 1.5%; color: #78330C; float: left; width: 14%">
           <h2>%</h2>
         </div>
-        <button style="position: absolute; bottom: 18%; font-size: large; font-weight: 600; color: rgb(3, 52, 167);" (click)="updateCategory(item, input.value)">Lưu</button>
+        <button style="position: absolute; bottom: 18%; font-size: large; font-weight: 600; color: rgb(3, 52, 167); left: 50%; transform: translateX(-50%)" (click)="updateCategory(item, input.value); input.value = ''">Lưu</button>
       </div>
     </div>
-    <div style="width: 50px; height: 50px; border-radius: 100px; border: 3px #ED2874 solid;position: fixed; bottom: 0%; left: 50%; transform: translateX(-50%);" (click)="clickMore()">
-      <button style="position: absolute; top: 40%; left: 50%; transform: translateX(-50%);">+</button>
+    <button style="color: #F78DA7; margin-bottom: 2%; float: right;" (click)="clickMorefirst()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; margin-bottom: 2%; float: left;" (click)="clickLast()"><h3>< Quay lại</h3></button>
+    <div style="width: 10%; height: 6%; background-color: #ED2874; position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%);" (click)="clickMore()">
+      <button style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #ED2874; color: white">Thêm</button>
     </div>
+    <ul class="pagination">
+      <li (click)="selectPage(1)"  [class.active]="count === 0">Trang đầu</li>
+      <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
+        {{ page }}
+      </li>
+      <li *ngIf="count < totalPages - 3">...</li>
+      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{ totalPages }}</li>
+    </ul>
   </div>
   <div id = "moreStorage" [ngStyle]="changeMoreStorage()">
     <form>
       <img alt="error" src="assets/icon/close.svg" (click)="clickMore()">
-      <div style="margin-top: 10%; position: absolute; left: 5%; width: 90%; height: auto;">
+      <div style="margin-top: 10%; position: absolute; left: 5%; width: 82%; height: auto;">
         <h3>Tên thể loại</h3>
         <input [(ngModel)]="inputName" type="text" name="style" placeholder="Tên thể loại"><br>
         <h3>Khuyến mãi</h3>
         <input [(ngModel)]="inputSale" type="text" name="sale" placeholder="Khuyến mãi"><br>
-        <input style="width: 20%; float: right;" type="submit" value="Lưu" (click)="saveNewCategory(); clickMore()"><br>
       </div>
     </form>
+    <div style="width: 36%; height: 14%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 9%">
+      <button style="height: 100%; width: 46%; float: left; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="saveNewCategory(); clickMore()">Lưu</button>
+      <button style="height: 100%; width: 46%; float: right; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="clickMore()">Bỏ</button>
+    </div>
+  </div>
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
   </div>
 </div>

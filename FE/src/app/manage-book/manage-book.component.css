@@ -62,7 +62,7 @@ table{
 }
 tr{
   width: 100%;
-  height: 2.5rem;
+  height: 2.8rem;
 }
 th, td {
   border: 0.15rem solid #57445A;
@@ -79,6 +79,11 @@ td{
 td input{
   width: 90%;
   height: 2rem;
+}
+
+th{
+  background-color: #78330C;
+  color: white;
 }
 
 #save{
@@ -151,6 +156,8 @@ td input{
 }
 
 #moreCategory{
+  max-height: 30%;
+  overflow-x: auto;
   width: 14%;
   height: auto;
   background-color: white;
@@ -167,6 +174,8 @@ td input{
 }
 
 #moreAuthor{
+  max-height: 30%;
+  overflow-x: auto;
   width: 14%;
   height: auto;
   background-color: white;
@@ -212,4 +221,134 @@ td input{
   border-color: black;
   border-style: solid;
   display: none;
+}
+
+#newBook{
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+  text-align: left;
+  padding-top: 0.5%;
+}
+#newBook > img{
+  width: 5%;
+  position: absolute;
+  right: 1%;
+}
+#newBook > h3{
+  margin-left: 5%;
+  margin-bottom: 2%;
+  float: left;
+}
+#newBook > input{
+  width: 90%;
+  height: 2rem;
+  align-items: center;
+  border-radius: 2rem;
+  border-style: solid;
+  border-color: #a4a4a4;
+  margin-bottom: 3%;
+}
+#newBook select {
+  z-index: -1;
+}
+
+#selectCategory{
+  width: 40%;
+  height: 10%;
+  position: absolute;
+  left: 5%;
+  top: 12%;
+}
+
+#selectAuthor{
+  width: 40%;
+  height: 28%;
+  position: absolute;
+  right: 5%;
+  top: 12%;
+}
+
+#moreSelectCategory{
+  max-height: 80%;
+  overflow-x: auto;
+  width: 70%;
+  background-color: white;
+  text-align: center;
+  border: solid 0.1rem black;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: none;
+}
+#moreSelectAuthor{
+  max-height: 80%;
+  overflow-x: auto;
+  width: 80%;
+  background-color: white;
+  text-align: center;
+  border: solid 0.1rem black;
+  position: absolute;
+  right: 0;
+  top: 18%;
+  z-index: 100;
+  display: none;
+}
+
+#Mess{
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 20%;
+  background-color: white;
+  float: left;
+  text-align: left;
+  align-items: normal;
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+
+#Mess img{
+  width: 5%;
+  height: auto;
+  float: right;
+  margin: 2%;
+}
+
+.pagination {
+  list-style-type: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pagination li {
+  margin-right: 1.5rem;
+}
+
+.pagination li.active {
+  color: red;
+  font-weight: bold;
 }

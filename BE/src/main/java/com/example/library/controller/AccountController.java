@@ -25,6 +25,12 @@ public class AccountController {
     public List<Account> getAllAccount(@PathVariable int count, @PathVariable int size){
         return accountService.getAllAccount(count, size);
     }
+
+    @GetMapping("/getCountAllAccount")
+    public int getCountAllAccount(){
+        return accountService.getCountAllAccount();
+    }
+
     @GetMapping("/findAllByRequest/{request}/{count}/{size}")
     public List<Account> findAllByRequest(@PathVariable String request, @PathVariable int count, @PathVariable int size){
         return accountService.findAllByRequest(request, count, size);
@@ -65,12 +71,16 @@ public class AccountController {
         return accountService.addNewMess(send.getTitle(), send.getContent(), count, size);
     }
     @PostMapping("/addNewAccount")
-    public Account addNewAccount(@RequestBody AccountMore accountMore){
+    public List<Account> addNewAccount(@RequestBody AccountMore accountMore){
         return accountService.addAccount(accountMore.getUsername(), accountMore.getEmail(), accountMore.getPhone(), accountMore.getAddress(), accountMore.getPassword(), accountMore.getType());
     }
     @PostMapping("/findAccountByTimeCreate/{count}/{size}")
     public List<Account> findAccountByTimeCreate(@RequestBody TimeCreate timeCreate, @PathVariable int count, @PathVariable int size){
         return accountService.findAccountByTimeCreate(timeCreate.getStart(), timeCreate.getEnd(), timeCreate.getStatus(), count, size);
+    }
+    @PostMapping("/getCountSelectAccount")
+    public int getCountSelectAccount(@RequestBody TimeCreate timeCreate){
+        return accountService.getCountSelectAccount(timeCreate.getStart(), timeCreate.getEnd(), timeCreate.getStatus());
     }
     @PostMapping("/findMessByTimeSent/{count}/{size}")
     public List<Mess> findMessByTimeSent(@RequestBody TimeCreate timeCreate, @PathVariable int count, @PathVariable int size){

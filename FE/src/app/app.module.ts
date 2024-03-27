@@ -75,7 +75,7 @@ export class Book{
   title:string | undefined;
   category:string | undefined;
   author:string | undefined;
-  image:string | undefined;
+  image:any | undefined;
   content:string | undefined;
   cost:number | undefined;
   bookId:number | undefined;
@@ -86,6 +86,7 @@ export class Book{
   sale:number | undefined;
   importTime:Date | undefined;
   status:string | undefined;
+  account:string | undefined;
 }
 
 
@@ -94,7 +95,7 @@ export class Account{
   name:string | undefined;
   email:string | undefined;
   status:string | undefined;
-  avatar:string | undefined;
+  avatar:any | undefined;
   phone: number | undefined;
   address:string | undefined;
   level:number | undefined;

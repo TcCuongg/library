@@ -22,9 +22,20 @@
       </div>
     </div>
   </div>
+  <div id = "search">
+    <div style="width: 18%; position: absolute; top: 50%; transform: translateY(-50%); right: 16%">
+      <h3 style="float: left; margin-right: 1%">{{statusStorage}}</h3>
+      <img style="width: 7%; transform: rotate(90deg)" alt="error" src="assets/icon/More.svg" (click)="clickMoreStatus()">
+    </div>
+    <button style="background-color: #ED2874; color: white; width: 10%; height: 100%; position: absolute; right: 0" (click)="selectStorage()">Tìm kiếm</button>
+  </div>
+  <div id = "moreStatus" [ngStyle]="changeMoreStatus()">
+    <p></p><br>
+    <div *ngFor="let item of listStatus">
+      <h3 (click)="selectStatus(item.status); clickMoreStatus()">{{item.status}}</h3><br>
+    </div>
+  </div>
   <div id = "nav">
-    <button style="color: #F78DA7; margin-bottom: 2%; float: right;" (click)="clickMore()"><h3>Xem thêm ></h3></button>
-    <button style="color: #F78DA7; margin-bottom: 2%; float: left;" (click)="clickLast()"><h3>< Quay lại</h3></button>
     <div style="display: grid; grid-template-columns: 50% 50%; width: 100%; height: 80%; margin-top: 6%;">
       <div class="storage" *ngFor="let item of datasStorage">
         <div style="position: absolute; top: 40%" (click)="sendContentStorage(item)">
@@ -42,7 +53,17 @@
           <button (click)="clickNewStorage()">+</button>
         </div>
       </div>
+      <button style="color: #F78DA7; position: absolute; right: 0; bottom: 2%" (click)="clickMore()"><h3>Xem thêm ></h3></button>
+      <button style="color: #F78DA7; position: absolute; left: 0; bottom: 2%" (click)="clickLast()"><h3>< Quay lại</h3></button>
     </div>
+    <ul class="pagination">
+      <li (click)="selectPage(1)"  [class.active]="count === 0">Trang đầu</li>
+      <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
+        {{ page }}
+      </li>
+      <li *ngIf="count < totalPages - 3">...</li>
+      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{ totalPages }}</li>
+    </ul>
   </div>
   <div id = "moreStorage" [ngStyle]="changeAddStorage()">
     <form>
@@ -52,8 +73,16 @@
         <input [(ngModel)]="storageName" type="text" name="nameStorage" placeholder="Số điện thoại liên hệ"><br>
         <h3>Địa chỉ</h3>
         <input [(ngModel)]="storageAddress" type="text" name="address" placeholder="Địa chỉ"><br>
-        <input style="width: 20%; float: right;" type="submit" value="Lưu" (click)="addNewStorage(); clickNewStorage()"><br>
+        <div style="width: 42%; position: absolute; left: 50%; transform: translateX(-50%); height: 20%; top: 100%">
+          <button style="width: 46%; height: 100%; float: left; margin: 0; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="addNewStorage(); clickNewStorage()">Lưu</button>
+          <button style="width: 46%; height: 100%; float: right; margin: 0; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="clickNewStorage()">Bỏ</button>
+        </div>
       </div>
     </form>
+  </div>
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
   </div>
 </div>

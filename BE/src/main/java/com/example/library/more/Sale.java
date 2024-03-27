@@ -8,8 +8,8 @@ import lombok.Setter;
 @Getter
 public class Sale {
     private Long id;
-    private int sale;
-    public Sale(Long id, int sale){
+    private String sale;
+    public Sale(Long id, String sale){
         this.id = id;
         this.sale = sale;
     }

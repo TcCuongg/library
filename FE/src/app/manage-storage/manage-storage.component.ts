@@ -15,13 +15,17 @@ export class ManageStorageComponent implements OnInit{
   inputValue:string = '';
   storageName:string = '';
   storageAddress:string = '';
-
+  mess = '';
+  statusStorage = 'Tất cả trạng thái';
+  listStatus = [{status:'Tất cả trạng thái'}, {status:'Mở cửa'}, {status:'Đóng cửa'}]
   valueSave:any;
 
 
   admin:Account | undefined;
 
   logOut = false;
+  isListStatus = false;
+  isMess = false;
   constructor(private productService: ProductService,
               private router: Router) {}
   ngOnInit() {
@@ -30,32 +34,52 @@ export class ManageStorageComponent implements OnInit{
     this.admin = JSON.parse(this.valueSave.getItem('value'));
   }
 
-  addNewStorage(){
-    if(this.storageName != '' && this.storageAddress != ''){
-      const url = 'http://localhost:8080/storage/addNewStorage/' + this.count + '/' + 3;
-      const body = {id: 0, phone: this.storageName, location: this.storageAddress};
+  clickMoreStatus(){
+    this.isListStatus = !this.isListStatus;
+  }
 
-      this.productService.postData(url, body).subscribe((res:any)=>{
-        this.datasStorage = res
-      });
+  changeMoreStatus(){
+    return{
+      'display':this.isListStatus?'block':'none',
     }
+  }
+  selectStatus(string:string){
+    this.statusStorage = string;
+  }
+
+  addNewStorage(){
+    const url = 'http://localhost:8080/storage/addNewStorage/' + this.totalPages + '/' + 3;
+    const body = {id: 0, phone: this.storageName, location: this.storageAddress, status: 'Đóng cửa'};
+    let dataCheck:Storage[]=[]
+    this.productService.postData(url, body).subscribe((res:any)=>{
+      dataCheck = res;
+      if(dataCheck.length == 0) this.mess='Thêm không thành công vui lòng kiểm tra lại thông tin nhập';
+      else this.mess = 'Thêm kho mới thành công';
+      this.isMess = true;
+      this.getAllStorage(this.count);
+    });
   }
 
   getAllStorage(count: number){
     this.productService.getAllStorage(count, 3).subscribe((res:any)=>{
       this.datasStorage = res
     })
+    this.productService.getCountAllStorage().subscribe((res:any) => {
+      this.totalPages = Math.ceil(res/3);
+    })
   }
 
-  datasCheckStorage:Storage[] = []
   clickMore(){
-    if (this.datasStorage.length==3){
-      this.productService.getAllStorage(this.count + 1, 3).subscribe((res:any)=>{
-        this.datasCheckStorage = res
-      })
-      if(this.datasCheckStorage.length != 0){
-        this.count = this.count + 1;
-        this.datasStorage = this.datasCheckStorage;
+    if (this.count < this.totalPages){
+      this.count += 1;
+      if(this.isCheckSelect == false){
+        this.productService.getAllStorage(this.count, 3).subscribe((res:any)=>{
+          this.datasStorage = res;
+        })
+      }else {
+        this.productService.getStorageByStatus(this.statusStorage, this.count, 3).subscribe((res:any)=>{
+          this.datasStorage = res;
+        })
       }
     }
   }
@@ -63,11 +87,21 @@ export class ManageStorageComponent implements OnInit{
   clickLast(){
     if(this.count - 1 >= 0 ){
       this.count = this.count - 1;
-      this.getAllStorage(this.count);
+      if(this.isCheckSelect == false){
+        this.productService.getAllStorage(this.count, 3).subscribe((res:any)=>{
+          this.datasStorage = res;
+        })
+      }else {
+        this.productService.getStorageByStatus(this.statusStorage, this.count, 3).subscribe((res:any)=>{
+          this.datasStorage = res;
+        })
+      }
     }
   }
   clickNewStorage(){
     this.status = !this.status;
+    this.storageName = '';
+    this.storageAddress = '';
   }
   changeAddStorage(){
     return{
@@ -82,6 +116,9 @@ export class ManageStorageComponent implements OnInit{
     this.count = 0;
     this.productService.getStorageByRequest(this.inputValue, this.count, 3).subscribe((res:any)=>{
       this.datasStorage = res
+    })
+    this.productService.getCountAllStorageByRequest(this.inputValue).subscribe((res:any) => {
+      this.totalPages = Math.ceil(res/3);
     })
   }
   changeLogout(){
@@ -103,13 +140,59 @@ export class ManageStorageComponent implements OnInit{
   }
 
   changeStorage(storage:Storage, status:string){
-    if(status != ''){
-      const url = 'http://localhost:8080/storage/updateStorage/' + this.count.toString() + '/' + 3;
-      const body = {storageId: storage.id, status: status}
-
-      this.productService.putData(url, body).subscribe((res:any)=>{
-        this.datasStorage = res
-      });
+    const url = 'http://localhost:8080/storage/updateStorage/' + this.count.toString() + '/3';
+    const body = {storageId: storage.id, status: status}
+    let dataCheck:Storage[]=[];
+    this.productService.putData(url, body).subscribe((res:any)=>{
+      dataCheck = res;
+      if(dataCheck.length == 0) this.mess='Không có gì để thay đổi';
+      else this.mess = 'Thay đổi thành công';
+      this.isMess = true;
+      this.getAllStorage(this.count);
+    });
+  }
+  changeMess(){
+    return{
+      'display':this.isMess ? 'block':'none',
     }
+  }
+  clickCloseMess(){
+    this.isMess = false;
+    this.mess = '';
+  }
+  isCheckSelect = false;
+  selectStorage(){
+    if(this.statusStorage != "Tất cả trạng thái"){
+      this.count = 0;
+      this.isCheckSelect = true;
+      this.productService.getStorageByStatus(this.statusStorage, this.count, 3).subscribe((res:any)=>{
+        this.datasStorage = res;
+      })
+    }
+  }
+
+
+
+
+  totalPages = 1;
+  currentPage: number = 1;
+  visiblePages: number = 3;
+
+  getVisiblePages(): number[] {
+    let pages: number[] = [];
+    let startPage: number = Math.max(this.count, 2);
+    let endPage: number = Math.min(startPage + this.visiblePages - 1, this.totalPages - 1);
+    if(endPage)
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    return pages;
+  }
+
+  selectPage(page: number) {
+    this.count = page - 1;
+    this.productService.getAllStorage(this.count, 3).subscribe((res:any)=>{
+      this.datasStorage = res
+    })
   }
 }

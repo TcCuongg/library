@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookStorageService {
@@ -16,20 +18,23 @@ public class BookStorageService {
     @Autowired
     private RedisTemplate redisBookStorageTemplate;
 
-    public BookStorage updateBookStorage(String bookStorageId, String image, String importTime, String quantity){
+    public List<BookStorage> updateBookStorage(String bookStorageId, String image, String quantity){
+        List<BookStorage> storageList = new ArrayList<>();
         BookStorage bookStorage = bookStorageRepository.findFirstById(Long.parseLong(bookStorageId));
         bookStorage.setImage(image);
-        bookStorage.setImportTime(LocalDateTime.parse(importTime));
+        bookStorage.setImportTime(LocalDateTime.now());
         bookStorage.setQuantity(Integer.parseInt(quantity));
         bookStorageRepository.save(bookStorage);
+        storageList.add(bookStorageRepository.findFirstById(Long.parseLong(bookStorageId)));
 
-        redisBookStorageTemplate.delete("getAllBook(*");
-        redisBookStorageTemplate.delete("getBookFollowDesc(*");
-        redisBookStorageTemplate.delete("getBookByTitle:" + bookStorage.getBookToBookStorage().getTitle() + "(*");
-        redisBookStorageTemplate.delete("getBookByCategory:" + bookStorage.getBookToBookStorage().getCategoryToBook().getName() +"(*");
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("getBookByStorage:*"));
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("getAllBook(*"));
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("getBookFollowDesc(*"));
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("getBookByTitle:" + bookStorage.getBookToBookStorage().getTitle() + "(*"));
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("getBookByCategory:" + bookStorage.getBookToBookStorage().getCategoryToBook().getName() +"(*"));
 
-        redisBookStorageTemplate.delete("findAllBookByRequest:*");
+        redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("findAllBookByRequest:*"));
 
-        return bookStorage;
+        return storageList;
     }
 }

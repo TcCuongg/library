@@ -13,13 +13,4 @@ public class BookSaveWithQuantity extends BookSave{
         this.bookCopyId = bookCopyId;
         this.quantity = quantity;
     }
-//    public String getQuantity(){
-//        return this.quantity;
-//    }
-//    public Long getBookCopyId(){
-//        return this.bookCopyId;
-//    }
-//    public void setBookCopyId(Long bookCopyId){
-//        this.bookCopyId = bookCopyId;
-//    }
 }

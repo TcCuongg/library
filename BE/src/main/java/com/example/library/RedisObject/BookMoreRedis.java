@@ -25,6 +25,7 @@ public class BookMoreRedis {
     private Long id;
     private String importTime;
     private String status;
+    private String account;
     public BookMoreRedis(BookMore bookMore){
         this.title = bookMore.getTitle();
         this.category = bookMore.getCategory();
@@ -41,6 +42,7 @@ public class BookMoreRedis {
         this.id = bookMore.getId();
         this.importTime = bookMore.getImportTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
         this.status = bookMore.getStatus();
+        this.account = bookMore.getAccount();
     }
     public BookMoreRedis(){}
 }

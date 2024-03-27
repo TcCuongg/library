@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CategoryService {
@@ -107,23 +108,41 @@ public class CategoryService {
 
 
 
-    public Category findFirstById(Long id, int sale){
-        Category category = categoryRepository.findFirstById(id);
-        category.setSale(sale);
-        redisCategoryTemplate.delete("getAllCategory");
-        redisCategoryTemplate.delete("getCategory(*");
-        redisCategoryTemplate.delete("getCategoryByTitle:" + category.getName() + "(*");
+    public List<Category> findFirstById(Long id, String sale){
+        List<Category> categoryList = new ArrayList<>();
+        if(!Objects.equals(sale, "")){
+            Category category = categoryRepository.findFirstById(id);
+            category.setSale(Integer.parseInt(sale));
+            categoryRepository.save(category);
+            categoryList.add(category);
+            redisCategoryTemplate.delete("getAllCategory");
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getCategory(*"));
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getCategoryByTitle:" + category.getName() + "(*"));
 
-        redisCategoryTemplate.delete("getAllBook(*");
-        redisCategoryTemplate.delete("getBookFollowDesc(*");
-        redisCategoryTemplate.delete("getBookByTitle:*");
-        redisCategoryTemplate.delete("getBookByCategory:" + category.getName() +"(*");
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getAllBook(*"));
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getBookFollowDesc(*"));
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getBookByTitle:*"));
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getBookByCategory:" + category.getName() +"(*"));
 
-        redisCategoryTemplate.delete("findAllBookByRequest:*");
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("findAllBookByRequest:*"));
 
-        return categoryRepository.save(category);
+            return categoryList;
+        }return categoryList;
     }
-    public Category addNewCategory(Category category){
-        return categoryRepository.save(category);
+    public List<Category> addNewCategory(Category category){
+        List<Category> categoryList = new ArrayList<>();
+        if(!Objects.equals(category.getName(), "")){
+            redisCategoryTemplate.delete("getAllCategory");
+            redisCategoryTemplate.delete("findAllCategoryName");
+            redisCategoryTemplate.delete(redisCategoryTemplate.keys("getCategory("+categoryRepository.getCountCategories()/4+", 4)"));
+            categoryRepository.save(category);
+            categoryList.add(categoryRepository.findFirstByOrderByIdDesc());
+            return categoryList;
+        }
+        return categoryList;
+    }
+
+    public int getCountCategories(){
+        return categoryRepository.getCountCategories();
     }
 }

@@ -21,7 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("select account from Account account")
     public List<Account> getAllAccount(Pageable pageable);
 
-    @Query("select count(account) from Account account")
+    @Query("select count(account.cardNumber) from Account account")
     public int getCountAllAccount();
 
     @Query("select account from  Account account where account.cardNumber = :cardNumber")
@@ -158,12 +158,14 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     public List<Account> selectAccount(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
                                        @Param("status") String status, Pageable pageable);
 
-    @Query("select count(account) from Account account where account.timeCreate >= :timeStart and account.timeCreate <= :timeEnd and" +
+    @Query("select count(account.cardNumber) from Account account where account.timeCreate >= :timeStart and account.timeCreate <= :timeEnd and" +
             " (:status is null or account.status = :status)")
-    public int countSelectAccount(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
+    public int getCountSelectAccount(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
                                        @Param("status") String status);
 
 
     public List<Account> findAllByEmail(String email);
     public List<Account> findAllByPhone(Long phone);
+
+    public Account findFirstByOrderByCardNumberDesc();
 }

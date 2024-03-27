@@ -22,6 +22,10 @@ public class CategoryController {
     public List<Category> getCategory(@PathVariable int count, @PathVariable int size){
         return categoryService.getCategory(count, size);
     }
+    @GetMapping("/getCountCategories")
+    public int getCountCategories(){
+        return categoryService.getCountCategories();
+    }
     @GetMapping("/getCategoryByTitle/{title}/{count}/{size}")
     public List<Category> getCategoryByTitle(@PathVariable String title, @PathVariable int count, @PathVariable int size){
         return categoryService.getCategoryByTitle(title, count, size);
@@ -33,13 +37,13 @@ public class CategoryController {
 
 
     @PutMapping("/updateCategorySale")
-    public Category updateCategorySale(@RequestBody Sale sale){
+    public List<Category> updateCategorySale(@RequestBody Sale sale){
         return categoryService.findFirstById(sale.getId(), sale.getSale());
     }
 
 
     @PostMapping("/addNewCategory")
-    public Category addNewCategory(@RequestBody Category category){
+    public List<Category> addNewCategory(@RequestBody Category category){
         return categoryService.addNewCategory(category);
     }
 }

@@ -40,12 +40,16 @@ export class ManageStyleComponent implements OnInit{
   getAllCategory(count:number){
     this.productService.getCategory(count, 4).subscribe((res:any) => {
       this.dataCategory = res
+    });
+    this.productService.getCountCategories().subscribe((res:any) => {
+      this.totalPages = Math.ceil(res/4);
     })
   }
 
   clickSearch(){
     this.productService.getCategoryByName(this.inputSearch, this.count, 4).subscribe((res:any) => {
-      this.dataCategory = res
+      this.dataCategory = res;
+      this.totalPages = 1;
     })
   }
 
@@ -55,37 +59,46 @@ export class ManageStyleComponent implements OnInit{
   }
 
   updateCategory(category:Category, input:string){
-    if(input != ''){
-      const url = 'http://localhost:8080/category/updateCategorySale';
-      const body = {id: category.id, sale: Number(input)}
-      this.productService.putData(url, body).subscribe((res:any) => {
-        this.category = res;
+    let dataCheck:Category[]=[];
+    const url = 'http://localhost:8080/category/updateCategorySale';
+    const body = {id: category.id, sale: input}
+    this.productService.putData(url, body).subscribe((res:any) => {
+      dataCheck = res;
+      if(dataCheck.length == 0) this.mess='Không có gì để thay đổi';
+      else this.mess = 'Thay đổi thành công';
+      this.isMess = true;
+      this.productService.getCategory(this.count, 4).subscribe((res:any) => {
+        this.dataCategory = res
       });
-    }
+    });
   }
 
   saveNewCategory(){
-    if(this.inputName != '' && this.inputSale != ''){
-      const url = 'http://localhost:8080/category/addNewCategory';
-      const body = {id: 0, name: this.inputName, sale: Number(this.inputSale)}
-      this.productService.postData(url, body).subscribe((res:any) => {
-        this.category = res;
-      });
+    const url = 'http://localhost:8080/category/addNewCategory';
+    if(this.inputSale == "") this.inputSale = "0";
+    const body = {id: 0, name: this.inputName, sale: Number(this.inputSale)}
+    let dataCheck:Category[]=[];
+    this.productService.postData(url, body).subscribe((res:any) => {
+      dataCheck = res;
+      if(dataCheck.length == 0) this.mess='Thêm thất bại vui lòng kiểm tra lại các trường';
+      else this.mess = 'Thêm mới thể loại ' + this.inputName + " thành công";
+      this.isMess = true;
       this.productService.getCategory(this.count, 4).subscribe((res:any) => {
-        this.dataCategory = res
-      })
-    }
+        this.dataCategory = res;
+      });
+      this.inputName = '';
+      this.inputSale = '';
+    });
   }
 
   clickMorefirst(){
-    if (this.dataCategory.length==4){
-      this.productService.getCategory(this.count + 1, 4).subscribe((res:any) => {
-        this.dataCheckCategory = res
-      })
-      if(this.dataCheckCategory.length != 0){
-        this.count = this.count + 1;
-        this.dataCategory = this.dataCheckCategory;
-      }
+    if (this.count < this.totalPages){
+      this.count += 1;
+      this.productService.getCategory(this.count, 4).subscribe((res:any) => {
+        this.dataCategory = res;
+      });
+      this.inputName = '';
+      this.inputSale = '';
     }
   }
 
@@ -122,5 +135,39 @@ export class ManageStyleComponent implements OnInit{
   clickManageStyle(){
     this.count = 0;
     this.getAllCategory(this.count);
+  }
+  isMess = false;
+  mess = '';
+  changeMess(){
+    return{
+      'display':this.isMess ? 'block':'none',
+    }
+  }
+  clickCloseMess(){
+    this.isMess = false;
+    this.mess = '';
+  }
+
+
+  totalPages = 1;
+  currentPage: number = 1;
+  visiblePages: number = 3;
+
+  getVisiblePages(): number[] {
+    let pages: number[] = [];
+    let startPage: number = Math.max(this.count, 2);
+    let endPage: number = Math.min(startPage + this.visiblePages - 1, this.totalPages - 1);
+    if(endPage)
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    return pages;
+  }
+
+  selectPage(page: number) {
+    this.count = page - 1;
+    this.productService.getCategory(this.count, 4).subscribe((res:any) => {
+      this.dataCategory = res
+    })
   }
 }

@@ -16,6 +16,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("select category from Category category")
     public List<Category> getCategories(Pageable pageable);
 
+    @Query("select count(category.id) from Category category")
+    public int getCountCategories();
+
     @Query("select DISTINCT category.name from Category category")
     public List<String> findAllCategoryName();
 
@@ -23,4 +26,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     public List<Category> getCategoriesByTitle(@Param("name") String name, Pageable pageable);
 
     public Category findFirstById(Long id);
+    public Category findFirstByOrderByIdDesc();
 }

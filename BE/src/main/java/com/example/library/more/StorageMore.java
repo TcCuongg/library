@@ -9,12 +9,10 @@ import lombok.Setter;
 public class StorageMore {
     private String bookStorageId;
     private String image;
-    private String importTime;
     private String quantity;
-    public StorageMore(String bookStorageId, String image, String importTime, String quantity){
+    public StorageMore(String bookStorageId, String image, String quantity){
         this.bookStorageId = bookStorageId;
         this.image = image;
-        this.importTime = importTime;
         this.quantity = quantity;
     }
 }

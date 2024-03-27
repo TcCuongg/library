@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -391,8 +392,9 @@ public class AccountService {
 
 
 
-    public Account addAccount(String username, String email, String phone, String address, String password, String type) {
+    public List<Account> addAccount(String username, String email, String phone, String address, String password, String type) {
         Account account = new Account();
+        List<Account> accounts = new ArrayList<>();
         if(accountRepository.findAllByEmail(email).isEmpty() && accountRepository.findAllByPhone(Long.parseLong(phone)).isEmpty()){
             account.setName(username);
             account.setEmail(email);
@@ -406,6 +408,8 @@ public class AccountService {
 
             account.setTimeCreate(LocalDateTime.now());
             accountRepository.save(account);
+
+            accounts.add(accountRepository.findFirstByOrderByCardNumberDesc());
 
             redisAccountRedisTemplate.delete("getAllAccount(" + accountRepository.getCountAllAccount()/11 + ", " + 11 + ")");
 
@@ -421,7 +425,7 @@ public class AccountService {
             redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAccountByTimeCreate:*"));
             redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
         }
-        return account;
+        return accounts;
     }
     public List<Account> closeAccountLowLevel(){
         List<Account> accounts = accountRepository.findAllByLowLevel();
@@ -487,6 +491,28 @@ public class AccountService {
         redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
         accountRepository.saveAll(accountList);
         return findAllMess(count, size);
+    }
+
+
+    public int getCountAllAccount(){
+        return accountRepository.getCountAllAccount();
+    }
+
+    public int getCountSelectAccount(String timeStart, String timeEnd, String status){
+        if(Objects.equals(timeStart, "")) timeStart = LocalDateTime.MIN.toString();
+        else if(!timeStart.contains("T") && !timeStart.contains(" ")){
+            timeStart += "T00:00:00";
+        } else{
+            timeStart = timeStart.replace(" ", "T");
+        }
+        if(Objects.equals(timeEnd, "")) timeEnd = "9999-12-31T23:59:59";
+        else if(!timeEnd.contains("T") && !timeEnd.contains(" ")){
+            timeEnd += "T00:00:00";
+        } else{
+            timeEnd = timeEnd.replace(" ", "T");
+        }
+        if(Objects.equals(status, "")) status = null;
+        return accountRepository.getCountSelectAccount(LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd), status);
     }
 
 

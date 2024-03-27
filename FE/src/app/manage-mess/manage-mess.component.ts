@@ -132,4 +132,15 @@ export class ManageMessComponent implements OnInit{
       this.datasMess = res;
     })
   }
+  isMess = false;
+  mess = '';
+  changeMess(){
+    return{
+      'display':this.isMess ? 'block':'none',
+    }
+  }
+  clickCloseMess(){
+    this.isMess = false;
+    this.mess = '';
+  }
 }
