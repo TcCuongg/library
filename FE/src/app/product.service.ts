@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {map, Observable, of} from 'rxjs';
-import {Account, Book, Category, Mess, Storage} from '../app/app.module';
+import {Account, Author, Book, BookPay, Category, Mess, Storage} from '../app/app.module';
 
 const httpOptions ={
   headers:new HttpHeaders({'Content-Type': 'application/octet-stream'})
@@ -40,12 +40,28 @@ export class ProductService {
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getAllBookByAccountBuy/' + accountId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
     )
   }
+  getAllBookByAccountBuyNew(accountId:number, count:number, size:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getAllBookByAccountBuyNew/' + accountId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
+    )
+  }
+  getAllBookByAccountBuyDelivered(accountId:number, count:number, size:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getAllBookByAccountBuyDelivered/' + accountId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
+    )
+  }
+  getAllBookByAccountBuyDelivering(accountId:number, count:number, size:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getAllBookByAccountBuyDelivering/' + accountId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
+    )
+  }
   getBookByCategory(title:string, count:number, step:number):Observable<Book[]>{
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByCategory/' + title + '/' + count.toString() + '/' + step.toString()).pipe(
     )
   }
   getBookByStorage(storageId:number, count:number, size:number){
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByStorage/' + storageId.toString() + '/' + count.toString() + '/' + size.toString()).pipe(
+    )
+  }
+  getBookByStorageIdAndCategory(storageId:number, category:string, count:number, size:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByStorageIdAndCategory/' + storageId.toString() + '/' + category + '/' + count.toString() + '/' + size.toString()).pipe(
     )
   }
   getBookRemainsZero(storageId:number, count:number, size:number){
@@ -66,6 +82,43 @@ export class ProductService {
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByRequest/' + request + '/' + count.toString() + '/' + step.toString()).pipe(
     )
   }
+  getBookByBookStorageOnStorage(bookStorageId:number, count:number, step:number){
+    return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookByBookStorageOnStorage/'+bookStorageId.toString()+'/'+count.toString()+'/'+step.toString()).pipe()
+  }
+
+
+
+
+  //BookPay
+  getAllBookPay(count:number, step:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getAllBookPay/' + count + '/' + step).pipe()
+  }
+  getBookPayByDelivering(count:number, step:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getBookPayByDelivering/' + count + '/' + step).pipe()
+  }
+  getBookPayByBom(count:number, step:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getBookPayByBom/' + count + '/' + step).pipe()
+  }
+  getBookPayByRequest(request:string, option:number, count:number, size:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getBookPayByRequest/' + request + '/' + option.toString() + '/' + count.toString() + '/' + size.toString()).pipe()
+  }
+  getBookPayByDelivered(count:number, size:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getBookPayByDelivered/' + count + '/' + size).pipe()
+  }
+  getBookPayByDeliveredRequest(request:string, count:number, size:number){
+    return this.httpClient.get<BookPay[]>('http://localhost:8080/book/getBookPayByDeliveredRequest/' + request + '/' + count + '/' + size).pipe()
+  }
+
+
+
+  //Author
+  getAllAuthor(count:number, size:number){
+    return this.httpClient.get<Author[]>('http://localhost:8080/author/getAllAuthor/' + count + '/' + size).pipe()
+  }
+  getAuthorByNameOrPhone(request:string, count:number, size:number){
+    return this.httpClient.get<Author[]>('http://localhost:8080/author/getAuthorByNameOrPhone/' + request + '/' + count + '/' + size).pipe()
+  }
+
 
 
 //Account
@@ -117,6 +170,9 @@ export class ProductService {
     return this.httpClient.get<Book[]>('http://localhost:8080/book/getBookManageByRequest/' + request + '/' + count.toString() + '/' + step.toString()).pipe(
     )
   }
+  getStorageId(bookStorageId:number){
+    return this.httpClient.get<number>('http://localhost:8080/bookStorage/getStorageId/'+bookStorageId.toString()).pipe()
+  }
 
 
   //get List<String>
@@ -161,6 +217,64 @@ export class ProductService {
   getCountCategories(){
     return this.httpClient.get<number>('http://localhost:8080/category/getCountCategories').pipe()
   }
+  getCountAllMess(){
+    return this.httpClient.get<number>('http://localhost:8080/account/getCountAllMess').pipe()
+  }
+  getCountAllMessByRequest(request:string){
+    return this.httpClient.get<number>('http://localhost:8080/account/getCountAllMessByRequest/' + request).pipe()
+  }
+  getCountAllAuthor(){
+    return this.httpClient.get<number>('http://localhost:8080/author/getCountAllAuthor').pipe()
+  }
+  getCountAuthorByNameOrPhone(request:string){
+    return this.httpClient.get<number>('http://localhost:8080/author/getCountAuthorByNameOrPhone/' + request).pipe()
+  }
+  getCountAllBookPay(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookPay').pipe()
+  }
+  getCountBookPayByDelivering(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookPayByDelivering').pipe()
+  }
+  getCountBookPayByBom(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookPayByBom').pipe()
+  }
+  getCountBookPayByRequest(request:string, option:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookPayByRequest/' + request + '/' + option.toString()).pipe()
+  }
+  getCountBookPayByDelivered(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookPayByDelivered').pipe()
+  }
+  getCountBookPayByDeliveredRequest(request:string){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookPayByDeliveredRequest/' + request).pipe()
+  }
+  getCountBookByStorageIdAndCategory(storageId:number, category:string){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookByStorageIdAndCategory/'+storageId.toString()+'/'+category).pipe()
+  }
+  getCountBookFollowDesc(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookFollowDesc').pipe()
+  }
+  getCountAllBook(){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBook').pipe()
+  }
+  getCountAllBookByAccountCart(accountId:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookByAccountCart/'+accountId.toString()).pipe()
+  }
+  getCountAllBookByAccountBuyNew(accountId:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookByAccountBuyNew/'+accountId.toString()).pipe()
+  }
+  getCountAllBookByAccountBuyDelivering(accountId:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookByAccountBuyDelivering/'+accountId.toString()).pipe()
+  }
+  getCountAllBookByAccountBuyDelivered(accountId:number){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountAllBookByAccountBuyDelivered/'+accountId.toString()).pipe()
+  }
+  getCountBookByCategory(category:string){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookByCategory/'+category).pipe()
+  }
+  getCountBookByTitle(bookTitle:string){
+    return this.httpClient.get<number>('http://localhost:8080/book/getCountBookByTitle/'+bookTitle).pipe()
+  }
+
 
 
   postData(url: string, body: any) {

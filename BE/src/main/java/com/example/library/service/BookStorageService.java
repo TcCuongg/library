@@ -1,6 +1,7 @@
 package com.example.library.service;
 
 import com.example.library.entity.BookStorage;
+import com.example.library.repository.AccountRepository;
 import com.example.library.repository.BookStorageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,13 +18,16 @@ public class BookStorageService {
     private BookStorageRepository bookStorageRepository;
     @Autowired
     private RedisTemplate redisBookStorageTemplate;
+    @Autowired
+    private AccountRepository accountRepository;
 
-    public List<BookStorage> updateBookStorage(String bookStorageId, String image, String quantity){
+    public List<BookStorage> updateBookStorage(String bookStorageId, String image, String quantity, Long accountId){
         List<BookStorage> storageList = new ArrayList<>();
         BookStorage bookStorage = bookStorageRepository.findFirstById(Long.parseLong(bookStorageId));
         bookStorage.setImage(image);
         bookStorage.setImportTime(LocalDateTime.now());
         bookStorage.setQuantity(Integer.parseInt(quantity));
+        bookStorage.setAccountToBookStorage(accountRepository.findFirstByCardNumber(accountId));
         bookStorageRepository.save(bookStorage);
         storageList.add(bookStorageRepository.findFirstById(Long.parseLong(bookStorageId)));
 
@@ -36,5 +40,9 @@ public class BookStorageService {
         redisBookStorageTemplate.delete(redisBookStorageTemplate.keys("findAllBookByRequest:*"));
 
         return storageList;
+    }
+
+    public Long getStorageId(Long bookStorageId){
+        return bookStorageRepository.findFirstById(bookStorageId).getStorageToBookStorage().getId();
     }
 }

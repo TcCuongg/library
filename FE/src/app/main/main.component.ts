@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Account, Book, Category} from "../app.module";
+import {Account, Book, Cart, Category} from "../app.module";
 import {ProductService} from "../product.service";
 import {Router} from "@angular/router";
 
@@ -25,6 +25,16 @@ export class MainComponent implements OnInit  {
   inputValueAddress = '';
   inputValueAddPass = '';
 
+  isSetUser = false;
+  isMess = false;
+  mess = '';
+  userName = '';
+  userEmail = '';
+  userPhone = '';
+  userAddress = '';
+  passOld = '';
+  passNew = '';
+
   valueSave:any;
 
   isClickLogin = false;
@@ -46,6 +56,62 @@ export class MainComponent implements OnInit  {
     this.checkUser();
     this.checkFontEnd();
   }
+
+  setUser(){
+    let userName = this.dataAccount?.name;
+    let userEmail = this.dataAccount?.email;
+    let userPhone = this.dataAccount?.phone?.toString();
+    let userAddress = this.dataAccount?.address;
+    let account:Account;
+    if(this.userName != '') userName = this.userName;
+    if(this.userEmail != '') userEmail = this.userEmail;
+    if(this.userPhone != '') userPhone = this.userPhone;
+    if(this.userAddress != '') userAddress = this.userAddress;
+
+    if(this.userName + this.userEmail + this.userPhone + this.userAddress + this.passOld + this.passNew == '') this.mess = 'Vui lòng nhập thông tin để thay đổi';
+    else if(this.passOld != '' && this.passNew == '') this.mess = 'Đổi mật khẩu thiếu mật khẩu mới';
+    else if(this.passOld == '' && this.passNew != '') this.mess = 'Đổi mật khẩu phải nhập mật khẩu cũ';
+    else{
+      const body = {userId: this.dataAccount?.cardNumber, userName:userName, userEmail:userEmail, userPhone:userPhone
+        , userAddress:userAddress, passOld:this.passOld, passNew:this.passNew};
+      this.productService.postData('http://localhost:8080/account/setUser', body).subscribe((res:any) => {
+        account = res;
+        if(account.address != null){
+          this.valueSave.clear();
+          this.valueSave.setItem('value', JSON.stringify(account));
+          this.dataAccount = JSON.parse(this.valueSave.getItem('value'));
+          this.mess = 'Sửa tài khoản thành công';
+          this.isSetUser = false;
+        }
+        else this.mess = 'Sửa tài khoản không thành công vui lòng kiểm tra lại các trường';
+      })
+    }
+    this.isMess = true;
+  }
+  clickSetting(){
+    this.isSetUser = false;
+    this.userName = '';
+    this.userEmail = '';
+    this.userPhone = '';
+    this.userAddress = '';
+    this.passOld = '';
+    this.passNew = '';
+  }
+  clickCloseMess(){
+    this.isMess = false;
+    this.mess = '';
+  }
+  changeMess(){
+    return{
+      'display':this.isMess ? 'block':'none',
+    }
+  }
+  changeSetUser(){
+    return{
+      'display':this.isSetUser ? 'block':'none',
+    }
+  }
+
   checkUser(){
     if(this.dataAccount != undefined){
       this.isLogin1 = !this.isLogin1;
@@ -112,20 +178,9 @@ export class MainComponent implements OnInit  {
   }
 
   sendToBuy(book:Book){
-    if(this.dataAccount != undefined){
-      let data = { message: book.id};
-      this.router.navigate(['/Buy', data]);
-    }
-    else {
-      this.clickLogin();
-    }
+    let data = { message: book.id};
+    this.router.navigate(['/Buy', data]);
   }
-
-  sendBookContent(name:Book){
-    let data = { message: name.id};
-    this.router.navigate(['/Search', data]);
-  }
-
   clickNewUser(){
     this.isClickNewUser = !this.isClickNewUser;
   }
@@ -171,7 +226,13 @@ export class MainComponent implements OnInit  {
     if(this.dataAccount != undefined){
       const url = 'http://localhost:8080/cart/addNewCart';
       const data = { bookStorageId: book.id, accountId: this.dataAccount.cardNumber};
-      this.productService.postData(url, data).subscribe();
+      let cart:Cart[]=[]
+      this.productService.postData(url, data).subscribe((res:any) => {
+        cart = res;
+        if(cart.length != 0) this.mess = "Thêm vào giỏ hàng thành công";
+        else this.mess = 'Thêm vào giỏ hàng thất bại'
+        this.isMess = true;
+      });
     }
     else this.clickLogin();
   }
@@ -204,11 +265,15 @@ export class MainComponent implements OnInit  {
   }
 
   clickAddUser(){
-    if(this.inputValueName !='' && this.inputValueAddEmail !='' && this.inputValuePhone !='' && this.inputValueAddress !='' && this.inputValueAddPass !=''){
-      const url = 'http://localhost:8080/account/addNewAccount';
-      const data = { username: this.inputValueName, email: this.inputValueAddEmail, phone: this.inputValuePhone,
-        address: this.inputValueAddress, password: this.inputValueAddPass };
-      this.productService.postData(url, data).subscribe();
-    }
+    const url = 'http://localhost:8080/account/addNewAccount';
+    const data = { username: this.inputValueName, email: this.inputValueAddEmail, phone: this.inputValuePhone,
+      address: this.inputValueAddress, password: this.inputValueAddPass, type: 'user' };
+    let dataCheck:Account[]=[]
+    this.productService.postData(url, data).subscribe((res:any) => {
+      dataCheck = res;
+    });
+    if(dataCheck.length == 0) this.mess = "Đăng ký thất bại vui lòng kiểm tra lại các trường";
+    else this.mess = "Đăng ký thành công";
+    this.isMess = true;
   }
 }

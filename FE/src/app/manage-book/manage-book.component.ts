@@ -26,6 +26,14 @@ export class ManageBookComponent implements OnInit {
   bookStatus = 'Tất cả trạng thái';
   bookCost:string | null = null;
 
+  isSetUser = false;
+  userName = '';
+  userEmail = '';
+  userPhone = '';
+  userAddress = '';
+  passOld = '';
+  passNew = '';
+
   data:any;
 
   count = 0;
@@ -57,8 +65,7 @@ export class ManageBookComponent implements OnInit {
   isBoxInput = false;
 
   constructor(private productService: ProductService,
-              private route: ActivatedRoute,
-              @Inject(LOCALE_ID) private locale: string) {}
+              private route: ActivatedRoute) {}
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.data = params;
@@ -69,6 +76,52 @@ export class ManageBookComponent implements OnInit {
     this.getAllCategoryName();
     this.getAllAuthorName();
     this.getAllStatus();
+  }
+
+  setUser(){
+    let userName = this.admin?.name;
+    let userEmail = this.admin?.email;
+    let userPhone = this.admin?.phone?.toString();
+    let userAddress = this.admin?.address;
+    let account:Account;
+    if(this.userName != '') userName = this.userName;
+    if(this.userEmail != '') userEmail = this.userEmail;
+    if(this.userPhone != '') userPhone = this.userPhone;
+    if(this.userAddress != '') userAddress = this.userAddress;
+
+    if(this.userName + this.userEmail + this.userPhone + this.userAddress + this.passOld + this.passNew == '') this.mess = 'Vui lòng nhập thông tin để thay đổi';
+    else if(this.passOld != '' && this.passNew == '') this.mess = 'Đổi mật khẩu thiếu mật khẩu mới';
+    else if(this.passOld == '' && this.passNew != '') this.mess = 'Đổi mật khẩu phải nhập mật khẩu cũ';
+    else{
+      const body = {userId: this.admin?.cardNumber, userName:userName, userEmail:userEmail, userPhone:userPhone
+        , userAddress:userAddress, passOld:this.passOld, passNew:this.passNew};
+      this.productService.postData('http://localhost:8080/account/setUser', body).subscribe((res:any) => {
+        account = res;
+        if(account.address != null){
+          this.valueSave.clear();
+          this.valueSave.setItem('value', JSON.stringify(account));
+          this.admin = JSON.parse(this.valueSave.getItem('value'));
+          this.mess = 'Sửa tài khoản thành công';
+          this.isSetUser = false;
+        }
+        else this.mess = 'Sửa tài khoản không thành công vui lòng kiểm tra lại các trường';
+      })
+    }
+    this.isMess = true;
+  }
+  clickSetting(){
+    this.isSetUser = false;
+    this.userName = '';
+    this.userEmail = '';
+    this.userPhone = '';
+    this.userAddress = '';
+    this.passOld = '';
+    this.passNew = '';
+  }
+  changeSetUser(){
+    return{
+      'display':this.isSetUser ? 'block':'none',
+    }
   }
 
   changeSetBook(){
@@ -280,7 +333,7 @@ export class ManageBookComponent implements OnInit {
     }
   }
   clickMore(){
-    if (this.count < this.totalPages){
+    if (this.count < this.totalPages - 1){
       this.count += 1;
       if(this.isCheck == false){
         if(this.data.messageFromManageStyle != undefined){
@@ -442,7 +495,7 @@ export class ManageBookComponent implements OnInit {
 
   getVisiblePages(): number[] {
     let pages: number[] = [];
-    let startPage: number = Math.max(this.count, 2);
+    let startPage: number = Math.max(this.count, 1);
     let endPage: number = Math.min(startPage + this.visiblePages - 1, this.totalPages - 1);
     if(endPage)
       for (let i = startPage; i <= endPage; i++) {

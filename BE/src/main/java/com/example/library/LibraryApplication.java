@@ -27,7 +27,7 @@ public class LibraryApplication extends SpringBootServletInitializer {
 				// thứ tự dịch vụ : url api, url fontend, các phương thức cho phép
 				// cho phép tất cả: reg.addMapping("/**").allowedOrigins("*")
 				// allowedMethods("phương thức được phép truy cập")
-				reg.addMapping("/**").allowedOrigins("http://localhost:4200").allowedMethods("POST", "GET", "PUT");
+				reg.addMapping("/**").allowedOrigins("http://localhost:4200").allowedMethods("POST", "GET", "PUT", "DELETE");
 			}
 		};
 	}

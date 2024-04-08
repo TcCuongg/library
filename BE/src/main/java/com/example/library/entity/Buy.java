@@ -37,6 +37,9 @@ public class Buy {
     @Column(name = "Cost")
     private Long cost;
 
+    @Column(name = "Quantity")
+    private int quantity;
+
     @JsonIgnore
     @OneToMany(mappedBy = "buyToCheckPay", cascade = CascadeType.ALL)
     private List<CheckPay> checkPaysFromBuy;

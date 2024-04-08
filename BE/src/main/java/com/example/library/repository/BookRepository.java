@@ -3,6 +3,7 @@ package com.example.library.repository;
 import com.example.library.entity.Book;
 import com.example.library.more.BookManage;
 import com.example.library.more.BookMore;
+import com.example.library.more.BookPay;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,6 +30,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
             " where book.status = 'Đang bán' and storage.status = 'Mở cửa'")
     public List<BookMore> getAllBook(Pageable pageable);
+
 
     @Query("select count(book.id) from Book book inner join" +
             " book.categoryToBook category on book.categoryToBook.id = category.id" +
@@ -64,6 +66,15 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " where book.status = 'Đang bán' and storage.status = 'Mở cửa'")
     public List<BookMore> getBookFollowDesc(Pageable pageable);
 
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
+            " where book.status = 'Đang bán' and storage.status = 'Mở cửa'")
+    public int getCountBookFollowDesc();
+
     @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
             "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
             "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
@@ -83,16 +94,16 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
             " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
-            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and category.name = :name and book.status = :status")
+            " where storage.status = 'Mở cửa' and category.name = :name and book.status = :status")
     public List<BookMore> getBookByCategory(@Param("status") String status, @Param("name") String name, Pageable pageable);
 
-    @Query("select count(book) from Book book inner join book.categoryToBook" +
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
             " category on book.categoryToBook.id = category.id" +
             " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
             " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
-            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and category.name = :name and book.status = 'Đang bán'")
+            " where storage.status = 'Mở cửa' and category.name = :name and book.status = 'Đang bán'")
     public int getCountBookByCategory(@Param("name") String name);
 
     @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
@@ -136,10 +147,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
             " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
-            " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and book.title = :title and book.status = 'Đang bán'")
+            " where storage.status = 'Mở cửa' and book.title = :title and book.status = 'Đang bán'")
     public List<BookMore> getBookByTitle(@Param("title") String title, Pageable pageable);
 
-    @Query("select count(book) from Book book inner join book.categoryToBook" +
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
             " category on book.categoryToBook.id = category.id" +
             " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
@@ -181,6 +192,28 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join bookStorage.accountToBookStorage account on bookStorage.accountToBookStorage.cardNumber = account.cardNumber" +
             " where storage.id = :id")
     public List<BookMore> getBookByStorageId(@Param("id") Long id, Pageable pageable);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status, account.email) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on storage.id = bookStorage.storageToBookStorage.id" +
+            " inner join bookStorage.accountToBookStorage account on bookStorage.accountToBookStorage.cardNumber = account.cardNumber" +
+            " where storage.id = :id and category.name = :name")
+    public List<BookMore> getBookByStorageIdAndCategory(@Param("id") Long id, @Param("name") String name, Pageable pageable);
+
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.storageToBookStorage storage on storage.id = bookStorage.storageToBookStorage.id" +
+            " inner join bookStorage.accountToBookStorage account on bookStorage.accountToBookStorage.cardNumber = account.cardNumber" +
+            " where storage.id = :id and category.name = :name")
+    public int getCountBookByStorageIdAndCategory(@Param("id") Long id, @Param("name") String name);
 
     @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
             "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
@@ -257,7 +290,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " where book.status = 'Đang bán' and storage.status = 'Mở cửa' and account.cardNumber = :cardNumber")
     public List<BookMore> getAllBookByAccountCart(@Param("cardNumber") Long cardNumber, Pageable pageable);
 
-    @Query("select count(book) from Book book inner join book.categoryToBook" +
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
             " category on book.categoryToBook.id = category.id" +
             " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
             " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
@@ -280,6 +313,71 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " where account.cardNumber = :cardNumber")
     public List<BookMore> getAllBookByAccountBuy(@Param("cardNumber") Long cardNumber, Pageable pageable);
 
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đang được người bán chuẩn bị'")
+    public List<BookMore> getAllBookByAccountBuyNew(@Param("cardNumber") Long cardNumber, Pageable pageable);
+
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đang được người bán chuẩn bị'")
+    public int getCountAllBookByAccountBuyNew(@Param("cardNumber") Long cardNumber);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đã giao thành công'")
+    public List<BookMore> getAllBookByAccountBuyDelivered(@Param("cardNumber") Long cardNumber, Pageable pageable);
+
+    @Query("select new com.example.library.more.BookMore(book.title, category.name, author.name, bookStorage.image, " +
+            "book.content, book.id, author.id, category.id, book.cost, book.follow, bookStorage.quantity, " +
+            "book.sale + category.sale, bookStorage.id, bookStorage.importTime, book.status) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đang trên đường giao'")
+    public List<BookMore> getAllBookByAccountBuyDelivering(@Param("cardNumber") Long cardNumber, Pageable pageable);
+
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đã giao thành công'")
+    public int getCountAllBookByAccountBuyDelivered(@Param("cardNumber") Long cardNumber);
+
+    @Query("select count(book.id) from Book book inner join book.categoryToBook" +
+            " category on book.categoryToBook.id = category.id" +
+            " inner join book.authorBooksFromBook authorBook on book.id = authorBook.bookToAuthorBook.id" +
+            " inner join authorBook.authorToAuthorBook author on authorBook.authorToAuthorBook.id = author.id" +
+            " inner join book.bookStoragesFromBook bookStorage on bookStorage.bookToBookStorage.id = book.id" +
+            " inner join bookStorage.buysFromBookStorage buy on bookStorage.id = buy.bookStorageToBuy.id" +
+            " inner join buy.accountToBuy account on buy.accountToBuy.cardNumber = account.cardNumber" +
+            " where account.cardNumber = :cardNumber and buy.status = 'Đơn hàng đang trên đường giao'")
+    public int getCountAllBookByAccountBuyDelivering(@Param("cardNumber") Long cardNumber);
 
     @Query("select count(book) from Book book inner join book.categoryToBook" +
             " category on book.categoryToBook.id = category.id" +
@@ -494,6 +592,325 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             " inner join bookStorage.storageToBookStorage storage on bookStorage.storageToBookStorage.id = storage.id" +
             " where storage.id = :id and author.name = :author")
     public int getCountAllBookByStorageAndAuthor(@Param("id") Long id, @Param("author") String author);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị'")
+    public List<BookPay> getAllBookPay(Pageable pageable);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.email = :email")
+    public List<BookPay> getBookPayByUserEmail(@Param("email") String email, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.name = :name")
+    public List<BookPay> getBookPayByUserName(@Param("name") String name, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.phone = :phone")
+    public List<BookPay> getBookPayByUserPhone(@Param("phone") Long phone, Pageable pageable);
+
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.email = :email")
+    public int getCountBookPayByUserEmail(@Param("email") String email);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.name = :name")
+    public int getCountBookPayByUserName(@Param("name") String name);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and accountBuy.phone = :phone")
+    public int getCountBookPayByUserPhone(@Param("phone") Long phone);
+
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị' and buy.id = :id")
+    public BookPay getBookPayByBuyId(@Param("id") Long id);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.id = :id")
+    public BookPay getByBuyId(@Param("id") Long id);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Hết hàng' and buy.id = :id")
+    public BookPay getBookPayRemainsZeroByBuyId(@Param("id") Long id);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Tài khoản mua hàng đã bị khóa' and buy.id = :id")
+    public BookPay getBookPayAccountCloseByBuyId(@Param("id") Long id);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao'")
+    public List<BookPay> getBookPayByDelivering(Pageable pageable);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.email = :email")
+    public List<BookPay> getBookPayByDeliveringByUserEmail(@Param("email") String email, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.name = :name")
+    public List<BookPay> getBookPayByDeliveringByUserName(@Param("name") String name, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.phone = :phone")
+    public List<BookPay> getBookPayByDeliveringByUserPhone(@Param("phone") Long phone, Pageable pageable);
+
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao' and accountBuy.email = :email")
+    public int getCountBookPayByDeliveringByUserEmail(@Param("email") String email);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao' and accountBuy.name = :name")
+    public int getCountBookPayByDeliveringByUserName(@Param("name") String name);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao' and accountBuy.phone = :phone")
+    public int getCountBookPayByDeliveringByUserPhone(@Param("phone") Long phone);
+
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao' and buy.id = :id")
+    public BookPay getBookPayByDeliveringByBuyId(@Param("id") Long id);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng Bom'")
+    public List<BookPay> getBookPayByBom(Pageable pageable);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.name = :name")
+    public List<BookPay> getBookPayByBomByUserName(@Param("name") String name, Pageable pageable);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.email = :email")
+    public List<BookPay> getBookPayByBomByUserEmail(@Param("email") String email, Pageable pageable);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where accountBuy.phone = :phone")
+    public List<BookPay> getBookPayByBomByUserPhone(@Param("phone") Long phone, Pageable pageable);
+
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng Bom' and accountBuy.name = :name")
+    public int getCountBookPayByBomByUserName(@Param("name") String name);
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng Bom' and accountBuy.email = :email")
+    public int getCountBookPayByBomByUserEmail(@Param("email") String email);
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng Bom' and accountBuy.phone = :phone")
+    public int getCountBookPayByBomByUserPhone(@Param("phone") Long phone);
+
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id" +
+            " inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "where buy.status = 'Đơn hàng đang được người bán chuẩn bị'")
+    public int getCountAllBookPay();
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đang trên đường giao'")
+    public int getCountBookPayByDelivering();
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng Bom'")
+    public int getCountBookPayByBom();
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công'")
+    public List<BookPay> getBookPayByDelivered(Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.email = :email")
+    public List<BookPay> getBookPayByDeliveredByUserEmail(@Param("email") String email, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.name = :name")
+    public List<BookPay> getBookPayByDeliveredByUserName(@Param("name") String name, Pageable pageable);
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.phone = :phone")
+    public List<BookPay> getBookPayByDeliveredByUserPhone(@Param("phone") Long phone, Pageable pageable);
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công'")
+    public int getCountBookPayByDelivered();
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.email = :email")
+    public int getCountBookPayByDeliveredByUserEmail(@Param("email") String email);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.name = :name")
+    public int getCountBookPayByDeliveredByUserName(@Param("name") String name);
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and accountBuy.phone = :phone")
+    public int getCountBookPayByDeliveredByUserPhone(@Param("phone") Long phone);
+
+    @Query("select new com.example.library.more.BookPay(buy.id, bookStorage.id, accountBuy.name, accountBuy.phone, accountBuy.email, accountBuy.address, book.title, buy.quantity" +
+            ", buy.cost, bookStorage.quantity, buy.status, accountManage.email) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "inner join book.categoryToBook category on book.categoryToBook.id = category.id " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and (:name is null or category.name = :name) and checkPay.timeChange >= :timeStart " +
+            "and checkPay.timeChange <= :timeEnd")
+    public List<BookPay> selectionBookPayByTurnover(@Param("name") String name, @Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd
+            , Pageable pageable);
+
+    @Query("select sum(buy.cost) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "inner join book.categoryToBook category on book.categoryToBook.id = category.id " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and (:name is null or category.name = :name) and checkPay.timeChange >= :timeStart " +
+            "and checkPay.timeChange <= :timeEnd")
+    public Long sumBookPayByTurnover(@Param("name") String name, @Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd);
+
+    @Query("select count(buy.id) from Book book inner join book.bookStoragesFromBook bookStorage " +
+            "on book.id = bookStorage.bookToBookStorage.id " +
+            "inner join bookStorage.buysFromBookStorage buy on buy.bookStorageToBuy.id = bookStorage.id inner join buy.checkPaysFromBuy " +
+            "checkPay on buy.id = checkPay.buyToCheckPay.id inner join buy.accountToBuy accountBuy on accountBuy.cardNumber = buy.accountToBuy.cardNumber " +
+            "inner join checkPay.accountToCheckPay accountManage on checkPay.accountToCheckPay.cardNumber = accountManage.cardNumber " +
+            "inner join book.categoryToBook category on book.categoryToBook.id = category.id " +
+            "where buy.status = 'Đơn hàng đã giao thành công' and (:name is null or category.name = :name) and checkPay.timeChange >= :timeStart " +
+            "and checkPay.timeChange <= :timeEnd")
+    public int countSelectionBookPayByTurnover(@Param("name") String name, @Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd);
+
 
 
 

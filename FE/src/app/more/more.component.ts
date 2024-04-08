@@ -13,7 +13,6 @@ export class MoreComponent implements OnInit{
   data: any;
   count= 0;
   datasBook:Book[]=[];
-  datasCheckBook:Book[]=[];
   dataAccount:Account | undefined;
   inputValue: string = '';
   inputValueEmail = '';
@@ -27,6 +26,16 @@ export class MoreComponent implements OnInit{
   inputValueAddress = '';
   inputValueAddPass = '';
 
+  isSetUser = false;
+  isMess = false;
+  mess1 = '';
+  userName = '';
+  userEmail = '';
+  userPhone = '';
+  userAddress = '';
+  passOld = '';
+  passNew = '';
+
   valueSave:any;
 
   isClickMore = false;
@@ -36,7 +45,6 @@ export class MoreComponent implements OnInit{
   isLogin2 = false;
   logOut = false;
   isBuy = false;
-  isCheck = false;
   constructor(private productService: ProductService,
               private route: ActivatedRoute,
               private router: Router) { }
@@ -45,13 +53,68 @@ export class MoreComponent implements OnInit{
     this.route.params.subscribe(params => {
       this.data = params;
     });
-    this.mess += this.data.message;
+    this.mess = this.data.message ?? '';
     this.getAllCategory();
     this.valueSave = window.localStorage;
     this.dataAccount = JSON.parse(this.valueSave.getItem('value'));
     this.checkUser();
     this.checkFontEnd();
     this.getBooks(this.count);
+  }
+
+  setUser(){
+    let userName = this.dataAccount?.name;
+    let userEmail = this.dataAccount?.email;
+    let userPhone = this.dataAccount?.phone?.toString();
+    let userAddress = this.dataAccount?.address;
+    let account:Account;
+    if(this.userName != '') userName = this.userName;
+    if(this.userEmail != '') userEmail = this.userEmail;
+    if(this.userPhone != '') userPhone = this.userPhone;
+    if(this.userAddress != '') userAddress = this.userAddress;
+
+    if(this.userName + this.userEmail + this.userPhone + this.userAddress + this.passOld + this.passNew == '') this.mess1 = 'Vui lòng nhập thông tin để thay đổi';
+    else if(this.passOld != '' && this.passNew == '') this.mess1 = 'Đổi mật khẩu thiếu mật khẩu mới';
+    else if(this.passOld == '' && this.passNew != '') this.mess = 'Đổi mật khẩu phải nhập mật khẩu cũ';
+    else{
+      const body = {userId: this.dataAccount?.cardNumber, userName:userName, userEmail:userEmail, userPhone:userPhone
+        , userAddress:userAddress, passOld:this.passOld, passNew:this.passNew};
+      this.productService.postData('http://localhost:8080/account/setUser', body).subscribe((res:any) => {
+        account = res;
+        if(account.address != null){
+          this.valueSave.clear();
+          this.valueSave.setItem('value', JSON.stringify(account));
+          this.dataAccount = JSON.parse(this.valueSave.getItem('value'));
+          this.mess1 = 'Sửa tài khoản thành công';
+          this.isSetUser = false;
+        }
+        else this.mess1 = 'Sửa tài khoản không thành công vui lòng kiểm tra lại các trường';
+      })
+    }
+    this.isMess = true;
+  }
+  clickSetting(){
+    this.isSetUser = false;
+    this.userName = '';
+    this.userEmail = '';
+    this.userPhone = '';
+    this.userAddress = '';
+    this.passOld = '';
+    this.passNew = '';
+  }
+  clickCloseMess(){
+    this.isMess = false;
+    this.mess1 = '';
+  }
+  changeMess(){
+    return{
+      'display':this.isMess ? 'block':'none',
+    }
+  }
+  changeSetUser(){
+    return{
+      'display':this.isSetUser ? 'block':'none',
+    }
   }
 
   checkFontEnd(){
@@ -70,56 +133,133 @@ export class MoreComponent implements OnInit{
     }
   }
   getBooks(count:number){
-    if(this.mess == "Truyện đề cử"){
-      this.productService.getBookFollowDesc(count, 8).subscribe((res:any)=>{
-        this.datasBook = res
-      })
+    if(Number(this.data.storage) > 0){
+      if(this.data.message == undefined && this.mess == ''){
+        this.productService.getBookByStorage(Number(this.data.storage), count, 8).subscribe((res:any) => {
+          this.datasBook = res;
+        })
+        this.productService.getCountBookByStorage(Number(this.data.storage)).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      if(this.data.message == undefined && this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng"){
+        this.productService.getBookByStorageIdAndCategory(this.data.storage, this.mess, count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+        this.productService.getCountBookByStorageIdAndCategory(Number(this.data.storage), this.mess).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
     }
-    else if(this.mess == "Truyện mới"){
-      this.productService.getAllBook(count, 8).subscribe((res:any)=>{
-        this.datasBook = res
-      })
-    }
-    else if(this.mess == "Giỏ hàng"){
-      this.productService.getAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0), count, 8).subscribe((res:any)=>{
-        this.datasBook = res
-      });
-    }
-    else if(this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng"){
-      this.productService.getBookByCategory(this.mess, count, 8).subscribe((res:any)=>{
-        this.datasBook = res
-      })
-    }
-    if(this.datasBook.length == 0){
-      this.productService.getBookByRequest(this.mess, count, 8).subscribe((res:any)=>{
-        this.datasBook = res
-      })
-    }
-  }
-
-  clickBuy(){
-    this.count = 0;
-    this.isCheck = true;
-    this.productService.getAllBookByAccountBuy(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
-      this.datasBook = res
-    });
-  }
-
-  clickMore(){
-    if (this.datasBook.length==8){
-      this.count = this.count + 1;
-      this.datasCheckBook = this.datasBook;
-      if(!this.isCheck){
-        this.getBooks(this.count);
-        if(this.datasBook == undefined){
-          this.datasBook = this.datasCheckBook;
-        }
-      }else {
-        this.productService.getAllBookByAccountBuy(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
-          this.datasBook = res
+    else {
+      if(this.mess == "Truyện đề cử"){
+        this.productService.getBookFollowDesc(count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+        this.productService.getCountBookFollowDesc().subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess == "Truyện mới"){
+        this.productService.getAllBook(count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+        this.productService.getCountAllBook().subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess == "Giỏ hàng"){
+        this.productService.getAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0), count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+        this.productService.getCountAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0)).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess == "Truyện mới đặt"){
+        this.productService.getAllBookByAccountBuyNew(this.dataAccount?.cardNumber ?? 0, count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
         });
-        if(this.datasBook == undefined){
-          this.datasBook = this.datasCheckBook;
+        this.productService.getCountAllBookByAccountBuyNew((this.dataAccount?.cardNumber ?? 0)).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess == "Truyện đang giao"){
+        this.productService.getAllBookByAccountBuyDelivering(this.dataAccount?.cardNumber ?? 0, count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        });
+        this.productService.getCountAllBookByAccountBuyDelivering((this.dataAccount?.cardNumber ?? 0)).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess == "Truyện đã giao"){
+        this.productService.getAllBookByAccountBuyDelivered(this.dataAccount?.cardNumber ?? 0, count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        });
+        this.productService.getCountAllBookByAccountBuyDelivered((this.dataAccount?.cardNumber ?? 0)).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+      else if(this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng" && this.mess != "Truyện mới đặt" && this.mess != "Truyện đang giao" && this.mess != "Truyện đã giao"){
+        this.productService.getBookByCategory(this.mess, count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        });
+        this.productService.getCountBookByCategory(this.mess).subscribe((res:any) => {
+          this.totalPages = Math.ceil(res/8);
+        })
+      }
+    }
+  }
+  clickMore(){
+    if (this.count < this.totalPages - 1){
+      this.count += 1;
+      if(Number(this.data.storage) > 0){
+        if(this.data.message == undefined && this.mess == ''){
+          this.productService.getBookByStorage(Number(this.data.storage), this.count, 8).subscribe((res:any) => {
+            this.datasBook = res;
+          })
+        }
+        if(this.data.message == undefined && this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng"){
+          this.productService.getBookByStorageIdAndCategory(this.data.storage, this.mess, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+      }
+      else {
+        if(this.mess == "Truyện đề cử"){
+          this.productService.getBookFollowDesc(this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện mới"){
+          this.productService.getAllBook(this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Giỏ hàng"){
+          this.productService.getAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0), this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện mới đặt"){
+          this.productService.getAllBookByAccountBuyNew(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện đang giao"){
+          this.productService.getAllBookByAccountBuyDelivering(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện đã giao"){
+          this.productService.getAllBookByAccountBuyDelivered(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng" && this.mess != "Truyện mới đặt" && this.mess != "Truyện đang giao" && this.mess != "Truyện đã giao"){
+          this.productService.getBookByCategory(this.mess, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
         }
       }
     }
@@ -128,7 +268,55 @@ export class MoreComponent implements OnInit{
   clickLast(){
     if(this.count - 1 >= 0 ){
       this.count = this.count - 1;
-      this.getBooks(this.count);
+      if(Number(this.data.storage) > 0){
+        if(this.data.message == undefined && this.mess == ''){
+          this.productService.getBookByStorage(Number(this.data.storage), this.count, 8).subscribe((res:any) => {
+            this.datasBook = res;
+          })
+        }
+        if(this.data.message == undefined && this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng"){
+          this.productService.getBookByStorageIdAndCategory(this.data.storage, this.mess, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+      }
+      else {
+        if(this.mess == "Truyện đề cử"){
+          this.productService.getBookFollowDesc(this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện mới"){
+          this.productService.getAllBook(this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Giỏ hàng"){
+          this.productService.getAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0), this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện mới đặt"){
+          this.productService.getAllBookByAccountBuyNew(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện đang giao"){
+          this.productService.getAllBookByAccountBuyDelivering(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess == "Truyện đã giao"){
+          this.productService.getAllBookByAccountBuyDelivered(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+        else if(this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng" && this.mess != "Truyện mới đặt" && this.mess != "Truyện đang giao" && this.mess != "Truyện đã giao"){
+          this.productService.getBookByCategory(this.mess, this.count, 8).subscribe((res:any)=>{
+            this.datasBook = res;
+          })
+        }
+      }
     }
   }
   clickMoreCategory(){
@@ -145,11 +333,14 @@ export class MoreComponent implements OnInit{
     this.productService.getBookByTitle(this.inputValue, this.count, 8).subscribe((res:any)=>{
       this.datasBook = res
     })
+    this.productService.getCountBookByTitle(this.inputValue).subscribe((res:any) => {
+      this.totalPages = Math.ceil(res/8);
+    })
   }
 
   sendBookContent(name:Book){
     let data = { message: name.id};
-    this.router.navigate(['/Search', data]);
+    this.router.navigate(['/Buy', data]);
   }
 
   getAllCategory(){
@@ -158,8 +349,8 @@ export class MoreComponent implements OnInit{
     })
   }
   value='';
-  clickCategory(category:Category){
-    this.mess = category.name ?? '';
+  clickCategory(category:string){
+    this.mess = category;
     this.count = 0;
     this.getBooks(this.count);
   }
@@ -239,15 +430,17 @@ export class MoreComponent implements OnInit{
     }
   }
   clickCart(){
+    this.count = 0;
+    this.mess = 'Giỏ hàng';
     if(this.dataAccount?.cardNumber != undefined){
-      this.count = 0;
       this.productService.getAllBookByAccountCart(this.dataAccount.cardNumber, this.count, 8).subscribe((res:any)=>{
-        this.datasBook = res
+        this.datasBook = res;
       });
+      this.productService.getCountAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0)).subscribe((res:any) => {
+        this.totalPages = Math.ceil(res/8);
+      })
     }
     else {
-      this.count = 0;
-      this.mess = 'Giỏ hàng';
       this.clickLogin();
     }
   }
@@ -256,8 +449,77 @@ export class MoreComponent implements OnInit{
     if(this.inputValueName !='' && this.inputValueAddEmail !='' && this.inputValuePhone !='' && this.inputValueAddress !='' && this.inputValueAddPass !=''){
       const url = 'http://localhost:8080/account/addNewAccount';
       const data = { username: this.inputValueName, email: this.inputValueAddEmail, phone: this.inputValuePhone,
-        address: this.inputValueAddress, password: this.inputValueAddPass };
+        address: this.inputValueAddress, password: this.inputValueAddPass , type:'user'};
       this.productService.postData(url, data).subscribe();
+    }
+  }
+
+
+  totalPages = 1;
+  currentPage: number = 1;
+  visiblePages: number = 3;
+
+  getVisiblePages(): number[] {
+    let pages: number[] = [];
+    let startPage: number = Math.max(this.count, 1);
+    let endPage: number = Math.min(startPage + this.visiblePages - 1, this.totalPages - 1);
+    if(endPage)
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    return pages;
+  }
+
+  selectPage(page: number) {
+    this.count = page - 1;
+    if(Number(this.data.storage) > 0){
+      if(this.data.message == undefined && this.mess == ''){
+        this.productService.getBookByStorage(Number(this.data.storage), this.count, 8).subscribe((res:any) => {
+          this.datasBook = res;
+        })
+      }
+      if(this.data.message == undefined && this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng"){
+        this.productService.getBookByStorageIdAndCategory(this.data.storage, this.mess, this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+    }
+    else {
+      if(this.mess == "Truyện đề cử"){
+        this.productService.getBookFollowDesc(this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess == "Truyện mới"){
+        this.productService.getAllBook(this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess == "Giỏ hàng"){
+        this.productService.getAllBookByAccountCart((this.dataAccount?.cardNumber ?? 0), this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess == "Truyện mới đặt"){
+        this.productService.getAllBookByAccountBuyNew(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess == "Truyện đang giao"){
+        this.productService.getAllBookByAccountBuyDelivering(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess == "Truyện đã giao"){
+        this.productService.getAllBookByAccountBuyDelivered(this.dataAccount?.cardNumber ?? 0, this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
+      else if(this.mess != "Truyện đề cử" && this.mess != "Truyện mới" && this.mess != "Giỏ hàng" && this.mess != "Truyện mới đặt" && this.mess != "Truyện đang giao" && this.mess != "Truyện đã giao"){
+        this.productService.getBookByCategory(this.mess, this.count, 8).subscribe((res:any)=>{
+          this.datasBook = res;
+        })
+      }
     }
   }
 }

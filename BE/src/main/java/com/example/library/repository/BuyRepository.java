@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BuyRepository extends JpaRepository<Buy, Long> {
+    public Buy findFirstById(Long id);
 }

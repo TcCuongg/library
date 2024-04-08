@@ -18,46 +18,202 @@
       <input [(ngModel)]="inputValueSearch" type="text" placeholder="Tìm kiếm sách">
       <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="sendInputValue()">
       <button style="position: absolute; left: 84%; transform: translateX(-16%)" (click)="send('Giỏ hàng')">Giỏ hàng</button>
-      <button style="color: #d35810; display: none; float: right" [ngStyle]="lastLogin2()" *ngIf="dataAccount"  (click)="clickUser()">{{dataAccount.name}}</button>
-      <div style="width: 12%; height: auto; position: absolute; top: 84%; left: 93%; transform: translate(-7%, -16%); background-color: #ED2874FF; text-align: center; padding: 1rem" [ngStyle]="changeLogout()">
-        <div id = "setting">Cài đặt</div><br>
+      <button style="float: right" (click)="clickLogin()" [ngStyle]="lastLogin1()">Đăng nhập</button>
+      <button style="color: #d35810; display: none; float: right" [ngStyle]="lastLogin2()" *ngIf="dataAccount" (click)="clickUser()">{{dataAccount.name}}</button>
+      <div style="width: 12%; height: auto; position: absolute; top: 110%; left: 93%; transform: translate(-7%, -16%); background-color: #ED2874FF; text-align: center; padding: 1rem" [ngStyle]="changeLogout()">
+        <div id = "setting" (click)="isSetUser = true; clickUser()">Cài đặt</div><br>
         <div id = "logout" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
       </div>
     </div>
   </div>
   <div id = "nav">
-    <div *ngIf="book">
+    <div *ngIf="book" style=" height: 100%;width: 100%;">
       <div id = "image">
         <img id="favoriteImage" alt="error" src="{{book.image}}"><br>
-        <button style="width: 100%; height: 2rem; background-color: #ED2874; border: none; border-radius: 10px; color: white; " (click)="clickSaveBuy(book, ((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue))">Mua truyện</button>
+<!--        <button style="width: 100%; height: 2rem; background-color: #ED2874; border: none; border-radius: 10px; color: white; " (click)="clickSaveBuy(book, ((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue))">Mua truyện</button>-->
       </div>
-      <div style="width: 30%; height: 100%; position: absolute; top: 74%; left: 60%; transform: translate(-40%, -26%)">
-        <h1 style="color: #78330C; margin-bottom: 10%; width: 100%; text-align: center">{{book.title}}</h1><br>
-        <h3 style="color: #78330C; float: left">Tác giả: </h3>
-        <h3 style="float: left">{{book.author}}</h3><br><br>
-        <h3 style="color: #78330C; float: left;">Số lượng:</h3>
-        <button (click)="sub()" style="float: left; margin-top: 0.5%; border: solid 2px; margin-left: 2%; width: 4%;">-</button>
-        <input [(ngModel)]="inputValue" type="text" name="count" style="margin-top: 0.5%; margin-left: 2%; width: 50px; border: solid 1px; text-align: right; float: left">
-        <button (click)="inputValue = String(parseInt(inputValue) + 1)" style="float: left; margin-top: 0.5%; border: solid 2px; margin-left: 2%; width: 4%;">+</button><br>
-        <div style="margin-top: 5%;">
-          <h3 style="float: left; margin-right: 1%">Đơn giá: </h3><p style="color: red;float: left"> {{book.cost}}VND</p><br><br>
-          <h3 style="float: left; margin-right: 1%">Giảm giá: </h3><p style="color: red; float: left"> {{((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p><br><br>
-          <h3 style="float: left; margin-right: 1%">Thành giá: </h3><p style="color: red; float: left">{{((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p>
+      <div style=" max-width: 100%; max-height: 100%; height: auto; width: 22%; position: absolute;right: 25%; top: 8%; text-align: left; ">
+        <h1 style="color: #78330C; width: 100%; text-align: center">{{book.title}}</h1><br>
+        <p style="color: #78330C; float: left ;font-size: 18px;">Mã hàng:&nbsp;&nbsp;</p><span>{{book.id}}</span><br><br>
+        <h3 style="color: #78330C; float: left; margin-top: 3%; ">Tác giả:&nbsp;&nbsp;</h3>
+        <h3 style="float: left ; margin-top: 3%;">{{book.author}}</h3><br><br><br>
+        <h3  style="color: #78330C; float: left; font-size: 18px; margin-top: 1%;">Trạng thái:&nbsp;&nbsp;</h3>
+        <h3 style="margin-top: 1%">{{book.status}}</h3>
+        <h3 style="color: #78330C; float: left; margin-top: 4%;">Số lượng:&nbsp;&nbsp;</h3>
+        <button  class="congtru" (click)="sub()" style="float: left; margin-top: 5%; border: solid 1px; margin-left: 2%; width: 5%; border-radius: 10px; ">-</button>
+        <input [(ngModel)]="inputValue" type="text" name="count" style="margin-top: 5%; margin-left: 2%; width: 50px; border: solid 1px; float: left;text-align: center;">
+        <button (click)="inputValue = String(parseInt(inputValue) + 1)" style="float: left; margin-top: 5%; border: solid 1px; margin-left: 2%; width: 5%; border-radius: 10px;">+</button><br><br>
+        <div style="margin-top:5%;height: 8rem;width: auto;">
+          <h3 style="color: #78330C; float: left; margin-right:  1%;">Nội dung:&nbsp;&nbsp;</h3><br>
+          <h3 style="width: 100%; height: 90%; float:left; display: -webkit-box; -webkit-box-orient: vertical; overflow-x: auto">{{book.content}}</h3>
+        </div>
+        <div style="margin-top:5%;height: 7rem;width: auto;">
+          <h3 style="float: left; margin-right:  1%;">Đơn giá:&nbsp;&nbsp;</h3><p style=" margin: 1%; float: left; color: red; font-weight: bold; text-decoration-color: red;"> {{book.cost}}VND</p><br><br>
+          <h3 style="float: left; font-size: 16px; margin-right: 1%">Giảm giá:&nbsp;&nbsp;</h3><p style=" margin: 1%; float: left; font-size: 14px; font-weight: bold; color: red; "> {{((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p><br><br>
+          <h3 style="float: left; margin-right: 1%">Thành giá:&nbsp;&nbsp;</h3><p style="margin: 1%; float: left; font-weight: bold; color: red;" >{{((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p>
+        </div>
+        <button  (click)="clickSaveBuy(book, ((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue))" class="buy" >Mua truyện</button>
+        <button (click)="clickSaveCart(book)" class="buy" >Thêm vào giỏ hàng</button>
+      </div>
+    </div>
+
+    <div style="position: absolute; height: 35rem; width: 24%; left: 2%; bottom: 5%; box-shadow: 0.2rem 0.2rem 0.1rem 0.1rem #1d1919;">
+      <div style="background-color: #f78da7; width: 100%; height: 2rem">
+        <div style="color: white; font-size: 18px; padding: 0.2rem;" (click)="sendStorage()">Sản phẩm liên quan</div>
+      </div>
+      <div style="width: 100%; height: 33rem; display: inline" *ngFor="let item of datasBook">
+        <div style="width: 99.9%; height: 8.25rem; float: left; background-color: rgb(236,211,211)" (click)="clickBook(item)">
+          <img style="height: 80%; width: auto; margin-top: 5%; float: left; margin-left: 8%" src="{{item.image}}" alt="error">
+          <div style="width: 60%; height: 100%; float: right; box-sizing: border-box; padding: 2.5rem">
+            <h3 style="color: #78330C">{{item.title}}</h3>
+            <h3 style="color: #78330C">{{item.author}}</h3>
+            <h3 style="color: #78330C">{{item.cost}}</h3>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
+
   <div id = "messBuy" *ngIf="book" [ngStyle]="changeMessBuy()">
     <img alt="error" src="assets/icon/close.svg" (click)="isClickBuy = !isClickBuy">
     <h2 style="position: absolute; left: 50%; transform: translateX(-50%); top: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Thông báo</h2><br>
     <div style="margin-top: 6%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
-      <h3>Đơn hàng {{book.title}} đặt hàng thành công, người bán hàng đang chuẩn bị!</h3><br>
+      <h3>Đơn hàng {{book.title}} {{mess}}</h3><br>
       <h3 style="float: left; margin-right: 1%; margin-left: 10%">Đơn giá: </h3><p style="color: red;float: left"> {{book.cost}}VND</p><br><br>
       <h3 style="float: left; margin-right: 1%; margin-left: 10%">Giảm giá: </h3><p style="color: red; float: left"> {{((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p><br><br>
       <h3 style="float: left; margin-right: 1%; margin-left: 10%">Thành giá: </h3><p style="color: red; float: left">{{((book.cost ?? 0) * parseInt(inputValue)) - ((book.cost ?? 0) * (book.sale ?? 0) / 100) * parseInt(inputValue)}}VND</p>
     </div>
   </div>
-  <div id = "footer">
-    <h3>Chào mừng đến hiệu sách của chúng tôi</h3>
+  <div id="login" [ngStyle]="changeLogin()">
+    <form>
+      <img alt="error" src="assets/icon/close.svg" (click)="clickLogin()">
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Chào mừng trở lại</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
+        <h3 style="margin-left: 5%">Email đăng nhập</h3><br>
+        <input [(ngModel)]="inputValueEmail" type="text" name="userName" placeholder="Email đăng nhập"><br>
+        <h3 style="margin-left: 5%">Mật khẩu</h3>
+        <input [(ngModel)]="inputValuePass" type="text" name="password" placeholder="Mật khẩu"><br>
+        <input style="width: 20%; float: right; margin-right: 5%" type="submit" value="Đăng nhập" (click)="clickLoginPost()"><br>
+        <p style="margin-right: 5%" (click)="clickNewUser(); clickLogin()">Đăng ký tài khoản mới?</p>
+      </div>
+    </form>
   </div>
+  <div id="newUser" [ngStyle]="changeNewUser()">
+    <form>
+      <img alt="error" src="assets/icon/close.svg" (click)="clickNewUser()">
+      <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem;">Đăng ký tài khoản mới</h2><br>
+      <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: auto;">
+        <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+        <input [(ngModel)]="inputValueName" type="text" name="userName" placeholder="Tên đăng nhập"><br>
+        <h3 style="margin-left: 5%">Email đăng nhập</h3>
+        <input [(ngModel)]="inputValueAddEmail" type="text" name="Email" placeholder="Email đăng nhập"><br>
+        <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+        <input style="float: none" [(ngModel)]="inputValuePhone" type="text" name="Phone" placeholder="SĐT liện hệ"><br>
+        <h3 style="margin-left: 5%">Địa chỉ</h3>
+        <input [(ngModel)]="inputValueAddress" type="text" name="address" placeholder="Địa chỉ"><br>
+        <h3 style="margin-left: 5%; float: none">Mật khẩu</h3>
+        <input [(ngModel)]="inputValueAddPass" type="text" name="password" placeholder="Mật khẩu"><br>
+        <input style="width: 20%; float: right; margin-right: 5%" type="submit" value="Đăng ký" (click)="clickAddUser();  clickNewUser(); clickLogin()"><br>
+      </div>
+    </form>
+  </div>
+  <div id = "setUser" [ngStyle]="changeSetUser()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isSetUser = false">
+    <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tài khoản</h2>
+    <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 88%">
+      <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+      <input [(ngModel)]="userName" type="text" placeholder="{{dataAccount?.name}}">
+      <h3 style="margin-left: 5%">Email đăng nhập</h3>
+      <input [(ngModel)]="userEmail" type="text" placeholder="{{dataAccount?.email}}">
+      <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+      <input style="float: none" [(ngModel)]="userPhone" type="text" placeholder="{{dataAccount?.phone}}">
+      <h3 style="margin-left: 5%">Địa chỉ</h3>
+      <input [(ngModel)]="userAddress" type="text" placeholder="{{dataAccount?.address}}">
+      <h3 style="margin-left: 5%;">Mật khẩu cũ</h3>
+      <input [(ngModel)]="passOld" type="text" placeholder="Mật khẩu cũ">
+      <h3 style="margin-left: 5%;">Mật khẩu mới</h3>
+      <input [(ngModel)]="passNew" type="text" placeholder="Mật khẩu mới">
+      <div style="width: 45%; height: 8%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 1%">
+        <button style="float: left; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="setUser()">Lưu</button>
+        <button style="float: right; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="clickSetting()">Bỏ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="vachngan">
+    <div>
+      <h3>Hỗ trợ trực tuyến</h3>
+    </div>
+    <div style="margin: 2%;width: 100%; height: 2px; background-color: #000; "></div>
+    <img class="imgicon" src="assets/icon/phone.svg" alt="loi">
+    <p style="font-size: 20px; margin-top: 1% ; width: auto;">0705255868</p><br>
+    <img  class="imgicon" src="assets/icon/fb.svg" alt="none">
+    <p  style="font-size: 20px; margin-top: 1% ; width: auto;">TCCuongg</p><br>
+    <img  class="imgicon" src="assets/icon/mail.svg" alt="none">
+    <p style="font-size: 20px; margin-top: 1% ; width: auto;">ttcuongg@gmail.com</p>
+    <div style="background-color:#F78DA7 ; margin-top:8%; height: 3rem; ">
+      <h3 style="color: white; padding: 12px;">Chính sách bán hàng</h3>
+      <br>
+      <div style="display: flex; margin-top: 5%; ">
+        <div style="background-color:#F78DA7 ; width: 10%;height: 50%; border-radius: 5px; "><h5 style="color: white; padding: 5px;">1</h5></div>
+        <p class="chinhsach">Giao hàng toàn quốc</p>
+      </div>
+
+      <div   style="display: flex; margin-top: 5%;">
+        <div style="background-color:#F78DA7 ; width: 10%;height: 50%; border-radius: 5px; "><h5 style="color: white; padding: 5px;">2</h5></div>
+        <p class="chinhsach">Thanh toán khi nhận hàng</p>
+      </div>
+
+      <div style="display: flex; margin-top: 5%;">
+        <div style="background-color:#F78DA7 ; width: 10%;height: 50%; border-radius: 5px; "><h5 style="color: white; padding: 5px;">3</h5></div>
+        <p class="chinhsach">Đổi trả trong vòng 7 ngày</p>
+      </div>
+
+      <div style="display: flex; margin-top: 5%;">
+        <div style="background-color:#F78DA7 ; width: 10%;height: 50%; border-radius: 5px; "><h5 style="color: white; padding: 5px;">4</h5></div>
+        <p class="chinhsach">Chất lượng đảm bảo</p>
+      </div>
+
+
+      <div style="display: flex; margin-top: 5%;">
+        <div style="background-color:#F78DA7 ; width: 10%;height: 50%; border-radius: 5px; "><h5 style="color: white; padding: 5px;">5</h5></div>
+        <p class="chinhsach">Hoàn ngay tiền mặt</p>
+      </div>
+    </div>
+  </div>
+
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
+  </div>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section about">
+          <h2>TTC</h2>
+          <p>CHỉ cần bạn cần chúng tôi có</p><br>
+          <ul class="socials">
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Instagram</a></li>
+          </ul>
+        </div>
+        <div class="footer-section links">
+          <h2>Liên Kết Hữu Ích</h2>
+          <ul>
+            <li><a href="#">Trang Chủ</a></li>
+            <li><a href="#">Dịch Vụ</a></li>
+            <li><a href="#">Sản Phẩm</a></li>
+            <li><a href="#">Liên Hệ</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2024 TTC. Bảo lưu mọi quyền.
+    </div>
+  </footer>
 </div>

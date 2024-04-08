@@ -30,6 +30,14 @@ export class ManageUserComponent implements OnInit {
   statusAccount = 'opend';
   mess = '';
 
+  isSetUser = false;
+  userName = '';
+  userEmail = '';
+  userPhone = '';
+  userAddress = '';
+  passOld = '';
+  passNew = '';
+
   valueSave:any;
 
 
@@ -57,6 +65,53 @@ export class ManageUserComponent implements OnInit {
   // clickNewAccount(){
   //   this.isNewAccount = !this.isNewAccount;
   // }
+
+  setUser(){
+    let userName = this.admin?.name;
+    let userEmail = this.admin?.email;
+    let userPhone = this.admin?.phone?.toString();
+    let userAddress = this.admin?.address;
+    let account:Account;
+    if(this.userName != '') userName = this.userName;
+    if(this.userEmail != '') userEmail = this.userEmail;
+    if(this.userPhone != '') userPhone = this.userPhone;
+    if(this.userAddress != '') userAddress = this.userAddress;
+
+    if(this.userName + this.userEmail + this.userPhone + this.userAddress + this.passOld + this.passNew == '') this.mess = 'Vui lòng nhập thông tin để thay đổi';
+    else if(this.passOld != '' && this.passNew == '') this.mess = 'Đổi mật khẩu thiếu mật khẩu mới';
+    else if(this.passOld == '' && this.passNew != '') this.mess = 'Đổi mật khẩu phải nhập mật khẩu cũ';
+    else{
+      const body = {userId: this.admin?.cardNumber, userName:userName, userEmail:userEmail, userPhone:userPhone
+        , userAddress:userAddress, passOld:this.passOld, passNew:this.passNew};
+      this.productService.postData('http://localhost:8080/account/setUser', body).subscribe((res:any) => {
+        account = res;
+        if(account.address != null){
+          this.valueSave.clear();
+          this.valueSave.setItem('value', JSON.stringify(account));
+          this.admin = JSON.parse(this.valueSave.getItem('value'));
+          this.mess = 'Sửa tài khoản thành công';
+          this.isSetUser = false;
+        }
+        else this.mess = 'Sửa tài khoản không thành công vui lòng kiểm tra lại các trường';
+      })
+    }
+    this.isMess = true;
+  }
+  clickSetting(){
+    this.isSetUser = false;
+    this.userName = '';
+    this.userEmail = '';
+    this.userPhone = '';
+    this.userAddress = '';
+    this.passOld = '';
+    this.passNew = '';
+  }
+  changeSetUser(){
+    return{
+      'display':this.isSetUser ? 'block':'none',
+    }
+  }
+
   changeNewAccount(){
     return{
       'display':this.isNewAccount ? 'block':'none',
@@ -158,6 +213,7 @@ export class ManageUserComponent implements OnInit {
     if(this.status != 'Tất cả trạng thái') status = this.status;
     if(this.status != 'Tất cả trạng thái' || this.start != '' ||this.end != ''){
       this.isCheckSelect = true;
+      this.isCheckRequest = false
       const body = {start: this.start, end: this.end, status: status}
       this.productService.postData(url, body).subscribe((res:any)=>{
         this.datasAccount = res;
@@ -186,13 +242,14 @@ export class ManageUserComponent implements OnInit {
     this.count = 0;
     if(this.inputValue != ''){
       this.isCheckRequest = true;
+      this.isCheckSelect = false;
       this.productService.getSearchAccount(this.inputValue, this.count, 11).subscribe((res:any)=>{
         this.datasAccount = res
       })
     }
   }
   clickMore(){
-    if (this.count < this.totalPages){
+    if (this.count < this.totalPages - 1){
       this.count += 1;
       if(this.isCheckRequest == true){
         this.productService.getSearchAccount(this.inputValue, this.count, 11).subscribe((res:any)=>{
@@ -287,7 +344,7 @@ export class ManageUserComponent implements OnInit {
 
   getVisiblePages(): number[] {
     let pages: number[] = [];
-    let startPage: number = Math.max(this.count, 2);
+    let startPage: number = Math.max(this.count, 1);
     let endPage: number = Math.min(startPage + this.visiblePages - 1, this.totalPages - 1);
     if(endPage)
     for (let i = startPage; i <= endPage; i++) {

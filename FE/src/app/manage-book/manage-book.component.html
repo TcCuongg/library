@@ -4,7 +4,9 @@
   <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
   <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
   <a style="color: white; text-decoration: none" [routerLink]="'/manageStyle'" [ngStyle]="changeColorTextStyle()"><h3>Quản lý thể loại</h3></a><br>
-  <a><h3>Quản lý doanh thu</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageAuthor'"><h3>Quản lý tác giả</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/managePay'"><h3>Quản lý đơn hàng</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageTurnover'"><h3>Quản lý doanh thu</h3></a><br>
 </div>
 <div id="body">
   <div id = "Head" [ngStyle]="changWeb()">
@@ -17,7 +19,7 @@
       <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
       <button style="color: #d35810; float: right" *ngIf="admin"  (click)="clickUser()"><h2>{{admin.name}}</h2></button>
       <div style="width: 12%; height: auto; position: absolute; top: 86%; right: 0; transform: translateY(-14%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 10;" [ngStyle]="changeLogout()">
-        <div id = "setting">Cài đặt</div><br>
+        <div id = "setting" (click)="isSetUser = true; clickUser()">Cài đặt</div><br>
         <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
       </div>
     </div>
@@ -100,17 +102,18 @@
   <button style="color: #F78DA7; position: absolute; bottom: 12%; right: 5%" (click)="clickMore()" [ngStyle]="changWeb()"><h3>Xem thêm ></h3></button>
   <button style="color: #F78DA7; position: absolute; bottom: 12%; left: 5%" (click)="clickLast()" [ngStyle]="changWeb()"><h3>< Quay lại</h3></button>
   <ul class="pagination">
-    <li (click)="selectPage(1)"  [class.active]="count === 0">Trang đầu</li>
+    <li (click)="selectPage(1)"  [class.active]="count === 0"><<</li>
     <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
       {{ page }}
     </li>
     <li *ngIf="count < totalPages - 3">...</li>
-    <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{ totalPages }}</li>
+    <li (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{totalPages}}</li>
+    <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">>></li>
   </ul>
   <button (click)="isBoxInput = true; isClickAddBook = true; isClickSetBook = false; backSave()" style="background-color: #ED2874; color: white; width: 10%; height: 5%; padding: 0.5%; position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%)" [ngStyle]="changWeb()">Thêm sách</button>
   <div id = "newBook" [ngStyle]="changeSetBook()">
     <img alt="error" src="assets/icon/close.svg" (click)="clickBack()">
-    <h2 style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem" [ngStyle]="{'display':isClickAddBook?'block':'none'}">Đăng ký tài khoản mới</h2>
+    <h2 style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem" [ngStyle]="{'display':isClickAddBook?'block':'none'}">Thêm sách mới</h2>
     <h2 style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem" [ngStyle]="{'display':isClickSetBook?'block':'none'}">Sửa thông tin sách</h2><br><br><br>
 
     <div id = "selectCategory" [ngStyle]="changeHeight()">
@@ -159,6 +162,28 @@
       <button style="float: left; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="changeBook(); clickBack()" [ngStyle]="{'display':isClickSetBook?'block':'none'}">Lưu</button>
       <button style="float: left; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="saveNewBook(); clickBack()" [ngStyle]="{'display':isClickAddBook?'block':'none'}">Thêm</button>
       <button style="float: right; width: 40%; height: 100%; background-color: #ED2874; color: white; border-radius: 0.5rem" (click)="clickBack()">Bỏ</button>
+    </div>
+  </div>
+  <div id = "setUser" [ngStyle]="changeSetUser()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isSetUser = false">
+    <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tài khoản</h2>
+    <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 88%">
+      <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+      <input [(ngModel)]="userName" type="text" placeholder="{{admin?.name}}"><br>
+      <h3 style="margin-left: 5%">Email đăng nhập</h3>
+      <input [(ngModel)]="userEmail" type="text" placeholder="{{admin?.email}}"><br>
+      <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+      <input style="float: none" [(ngModel)]="userPhone" type="text" placeholder="{{admin?.phone}}"><br>
+      <h3 style="margin-left: 5%">Địa chỉ</h3>
+      <input [(ngModel)]="userAddress" type="text" placeholder="{{admin?.address}}"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu cũ</h3>
+      <input [(ngModel)]="passOld" type="text" placeholder="Mật khẩu cũ"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu mới</h3>
+      <input [(ngModel)]="passNew" type="text" placeholder="Mật khẩu mới">
+      <div style="width: 45%; height: 8%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 1%">
+        <button style="float: left; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="setUser()">Lưu</button>
+        <button style="float: right; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="clickSetting()">Bỏ</button>
+      </div>
     </div>
   </div>
   <div id = "Mess" [ngStyle]="changeMess()">

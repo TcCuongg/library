@@ -16,7 +16,7 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("/addNewCart")
-    public Cart addNewCart(@RequestBody CartSave cartSave){
+    public List<CartSave> addNewCart(@RequestBody CartSave cartSave){
         return cartService.addNewCart(cartSave.getBookStorageId(), cartSave.getAccountId());
     }
 }

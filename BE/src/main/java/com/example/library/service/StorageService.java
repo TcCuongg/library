@@ -2,6 +2,7 @@ package com.example.library.service;
 
 import com.example.library.RedisObject.BookMoreRedis;
 import com.example.library.entity.*;
+import com.example.library.more.AuthorBookId;
 import com.example.library.more.BookListSave;
 import com.example.library.more.BookMore;
 import com.example.library.repository.*;
@@ -237,9 +238,10 @@ public class StorageService {
 
                 book1 = bookRepository.findFirstByOrderByIdDesc();
 
-                AuthorBook authorBook = new AuthorBook();
-                authorBook.setAuthorToAuthorBook(author);
-                authorBook.setBookToAuthorBook(book1);
+                AuthorBookId authorBookId = new AuthorBookId();
+                authorBookId.setAuthorId(book1.getId());
+                authorBookId.setBookId(author.getId());
+                AuthorBook authorBook = new AuthorBook(authorBookId, book1, author);
                 authorBookRepository.save(authorBook);
 
                 author.getAuthorBooksFromAuthor().add(authorBook);
@@ -258,12 +260,6 @@ public class StorageService {
                 account.getBookStoragesFromAccount().add(bookStorage);
                 account.setBookStoragesFromAccount(account.getBookStoragesFromAccount());
                 accountRepository.save(account);
-
-                book1.getAuthorBooksFromBook().add(authorBook);
-                book1.setAuthorBooksFromBook(book1.getAuthorBooksFromBook());
-                book1.getBookStoragesFromBook().add(bookStorage);
-                book1.setBookStoragesFromBook(book1.getBookStoragesFromBook());
-                bookRepository.save(book1);
 
                 category.getBooksFromCategory().add(book1);
                 category.setBooksFromCategory(category.getBooksFromCategory());
@@ -312,9 +308,10 @@ public class StorageService {
             redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByTitle:*"));
             redisStorageTemplate.delete(redisStorageTemplate.keys("getBookByCategory:*"));
             redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookByRequest:*"));
+            redisStorageTemplate.delete(redisStorageTemplate.keys("findAllBookManage(*"));
             return bookRepository.getBookByStorageId(storageId, pageable);
         }
-        return null;
+        else return null;
     }
 
     public int getCountAllStorage(){

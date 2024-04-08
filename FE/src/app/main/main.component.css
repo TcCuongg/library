@@ -109,6 +109,7 @@ button{
   position: relative;
   left: 50%;
   transform: translateX(-50%);
+  margin-bottom: 5%;
 }
 
 .listBook{
@@ -121,10 +122,11 @@ button{
   margin-bottom: 2%;
 }
 
+
 .listBook div img{
   margin-top: 10%;
-  width: 60%;
-  height: auto;
+  width: 70%;
+  height: 89.5%;
 }
 
 #footer{
@@ -184,7 +186,7 @@ button{
 
 #more{
   width: 88%;
-  height: auto;
+  height: 20rem;
   background-color: white;
   z-index: 100;
   margin-top: 2%;
@@ -194,6 +196,7 @@ button{
   border-style: solid;
   display: none;
   float: left;
+  overflow-x: auto;
 }
 
 #newUser{
@@ -238,4 +241,202 @@ button{
   bottom: 0px;
   right: 0px;
   color: rgb(3, 52, 167);
+}
+
+#setUser{
+  z-index: 2;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 76%;
+  background-color: white;
+  float: left;
+  text-align: left;
+  align-items: normal;
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+#setUser > img{
+  width: 5%;
+  height: auto;
+  float: right;
+  margin: 2%;
+}
+
+#setUser input{
+  margin-bottom: 5%;
+  width: 90%;
+  height: 2rem;
+  align-items: center;
+  border-radius: 2rem;
+  border-style: solid;
+  border-color: #a4a4a4;
+}
+#messBuy{
+  width: 50%;
+  height: 60%;
+  z-index: 2;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  background-color: white;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+
+#messBuy img{
+  width: 4%;
+  height: auto;
+  float: right;
+  margin: 1%;
+
+}
+
+#Mess{
+  z-index: 2;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 30%;
+  background-color: white;
+  float: left;
+  text-align: left;
+  align-items: normal;
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+
+#Mess img{
+  width: 5%;
+  height: auto;
+  float: right;
+  margin: 2%;
+}
+
+.footer {
+  background-color: #c78897;
+  color: #fff;
+  padding: 50px 0;
+  margin-top: 2%;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+
+}
+
+.footer-content {
+
+  display: flex;
+  width: 75%;
+  margin-left: 9%;
+
+}
+
+.footer-section {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.footer-section h2 {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-section p {
+  font-size: 14px;
+}
+
+.socials {
+  list-style: none;
+  padding: 0;
+}
+
+.socials li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.socials li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.contact-form .text-input {
+  width: 87%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.contact-form .btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #777;
+  font-size: 14px;
+}
+.arrow{
+
+
+  width: 0;
+  height: 0;
+  border-top: 30px solid transparent;
+  border-bottom: 0px solid transparent;
+  border-left: 20px solid #f78da7;
+  margin-left: 10%;
+
+}
+.caidatDangxuat{
+  width: 12%;
+  height: auto;
+  position: absolute;
+  top: 88%; left: 92%;
+  transform: translate(-8%, -12%);
+  background-color: #ED2874FF;
+  text-align: center;
+  padding: 1rem
 }

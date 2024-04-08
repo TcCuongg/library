@@ -1,0 +1,115 @@
+<div style="width: 16%; height: 100%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0; top: 0; padding-top: 6%; text-align: center">
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
+  <a><h3 style="color: white;" [routerLink]="'/manageStyle'">Quản lý thể loại</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageAuthor'"><h3>Quản lý tác giả</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/managePay'"><h3>Quản lý đơn hàng</h3></a><br>
+  <a style="color: red; text-decoration: none" [routerLink]="'/manageTurnover'"><h3>Quản lý doanh thu</h3></a><br>
+</div>
+<div id = "body">
+  <div id = "Head">
+    <div id = "name">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "categori">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm khách hàng">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
+      <button style="color: #d35810; float: right" *ngIf="admin" (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <div style="width: 12%; height: auto; position: absolute; top: 140%; right: 0; transform: translateY(-14%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 2;" [ngStyle]="changeLogout()">
+        <div id = "setting" (click)="isSetUser = true; clickUser()">Cài đặt</div><br>
+        <div id = "logout" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 7%">
+    <h2 style="float:left">Tổng doanh thu:&#160;&#160;&#160;</h2>
+    <h2 style="float:left; color: #78330C">{{cost}}&#160;&#160;VND</h2>
+  </div>
+  <div id = "select">
+    <div style="width: 18%; height: 100%; position: absolute; left: 0">
+      <h3>{{categoryName}}</h3>
+      <img alt="error" src="assets/icon/More.svg" (click)="clickCategoryMore()">
+    </div>
+    <div style="width: 60%; height: 100%; position: absolute; left: 52%; top: 50%; transform: translate(-48%, -50%)">
+      <h3>Thời gian:</h3>
+      <input [(ngModel)]="timeStart" style="left: 40%; transform: translate(-60%, -50%)" type="text" placeholder="Thời gian bắt đầu">
+      <input [(ngModel)]="timeEnd" style="right: 0" type="text" placeholder="Thời gian kết thúc">
+    </div>
+    <button style="position: absolute; top: 50%; transform: translateY(-50%); right: 0; background-color: #ED2874; color: white; width: 10%; height: 100%" (click)="clickSelection()">Tìm kiếm</button>
+  </div>
+  <div id = "moreCategory" [ngStyle]="changeCategoryMore()">
+    <p></p><br>
+    <h3 (click)="selectCategory('Tất cả thể loại')">Tất cả thể loại</h3><br>
+    <div *ngFor="let item of dataCategory">
+      <h3 (click)="selectCategory(item)">{{item}}</h3><br>
+    </div>
+  </div>
+  <div id = "nav">
+    <table>
+      <tr>
+        <th colspan="4">Người mua</th>
+        <th rowspan="2">Sách đặt</th>
+        <th rowspan="2">Thành giá</th>
+        <th rowspan="2">Lượng đặt</th>
+        <th rowspan="2">Nhân viên</th>
+      </tr>
+      <tr>
+        <th>Tên</th>
+        <th>SĐT</th>
+        <th>Email</th>
+        <th>Địa chỉ</th>
+      </tr>
+      <tr *ngFor="let item of datasBookPay">
+        <td style="width: 12%">{{item.accountName}}</td>
+        <td style="width: 12%">{{item.accountPhone}}</td>
+        <td style="width: 12%">{{item.accountEmail}}</td>
+        <td>{{item.accountAddress}}</td>
+        <td style="width: 12%">{{item.bookTitle}}</td>
+        <td style="width: 10%">{{item.buyCost}}</td>
+        <td style="width: 6%">{{item.buyQuantity}}</td>
+        <td style="width: 10%">{{item.employee}}</td>
+      </tr>
+    </table>
+    <button style="color: #F78DA7; position: absolute; bottom: 4%; right: 0" (click)="clickMore()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; position: absolute; bottom: 4%; left: 0" (click)="clickLast()"><h3>< Quay lại</h3></button>
+    <ul class="pagination">
+      <li (click)="selectPage(1)"  [class.active]="count === 0"><<</li>
+      <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
+        {{ page }}
+      </li>
+      <li *ngIf="count < totalPages - 3">...</li>
+      <li (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{totalPages}}</li>
+      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">>></li>
+    </ul>
+  </div>
+  <div id = "setUser" [ngStyle]="changeSetUser()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isSetUser = false">
+    <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tài khoản</h2>
+    <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 88%">
+      <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+      <input [(ngModel)]="userName" type="text" placeholder="{{admin?.name}}"><br>
+      <h3 style="margin-left: 5%">Email đăng nhập</h3>
+      <input [(ngModel)]="userEmail" type="text" placeholder="{{admin?.email}}"><br>
+      <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+      <input style="float: none" [(ngModel)]="userPhone" type="text" placeholder="{{admin?.phone}}"><br>
+      <h3 style="margin-left: 5%">Địa chỉ</h3>
+      <input [(ngModel)]="userAddress" type="text" placeholder="{{admin?.address}}"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu cũ</h3>
+      <input [(ngModel)]="passOld" type="text" placeholder="Mật khẩu cũ"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu mới</h3>
+      <input [(ngModel)]="passNew" type="text" placeholder="Mật khẩu mới">
+      <div style="width: 45%; height: 8%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 1%">
+        <button style="float: left; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="setUser()">Lưu</button>
+        <button style="float: right; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="clickSetting()">Bỏ</button>
+      </div>
+    </div>
+  </div>
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
+  </div>
+</div>

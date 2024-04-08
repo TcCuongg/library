@@ -39,9 +39,17 @@ public class AccountController {
     public List<Mess> findAllMess(@PathVariable int count, @PathVariable int size){
         return accountService.findAllMess(count, size);
     }
+    @GetMapping("/getCountAllMess")
+    public int getCountAllMess(){
+        return accountService.getCountAllMess();
+    }
     @GetMapping("/findAllMessByRequest/{request}/{count}/{size}")
     public List<Mess> findAllMessByRequest(@PathVariable String request, @PathVariable int count, @PathVariable int size){
         return accountService.findAllMessByRequest(request, count, size);
+    }
+    @GetMapping("/getCountAllMessByRequest/{request}")
+    public int getCountAllMessByRequest(@PathVariable String request){
+        return accountService.getCountAllMessByRequest(request);
     }
     @GetMapping("/findAllAccountStatus")
     public List<String> findAllAccountStatus(){
@@ -66,9 +74,9 @@ public class AccountController {
         return accountService.updateAccount(accountSave.getCardNumber(), accountSave.getName(), accountSave.getEmail(),
                 accountSave.getPhone(), accountSave.getAddress(), accountSave.getLevel(), accountSave.getStatus(), count, size);
     }
-    @PostMapping("/addNewMess/{count}/{size}")
-    public List<Mess> addNewMess(@RequestBody Send send, @PathVariable int count, @PathVariable int size){
-        return accountService.addNewMess(send.getTitle(), send.getContent(), count, size);
+    @PostMapping("/addNewMess")
+    public int addNewMess(@RequestBody Send send){
+        return accountService.addNewMess(send.getTitle(), send.getContent());
     }
     @PostMapping("/addNewAccount")
     public List<Account> addNewAccount(@RequestBody AccountMore accountMore){
@@ -85,5 +93,13 @@ public class AccountController {
     @PostMapping("/findMessByTimeSent/{count}/{size}")
     public List<Mess> findMessByTimeSent(@RequestBody TimeCreate timeCreate, @PathVariable int count, @PathVariable int size){
         return accountService.findMessByTimeSent(timeCreate.getStart(), timeCreate.getEnd(), count, size);
+    }
+    @PostMapping("/getCountAllMessBySent")
+    public int getCountAllMessBySent(@RequestBody TimeCreate timeCreate){
+        return accountService.getCountAllMessBySent(timeCreate.getStart(), timeCreate.getEnd());
+    }
+    @PostMapping("/setUser")
+    public Account setUser(@RequestBody SetUser setUser){
+        return accountService.setUser(setUser);
     }
 }

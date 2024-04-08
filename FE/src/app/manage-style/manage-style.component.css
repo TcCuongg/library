@@ -169,6 +169,7 @@ button{
   bottom: 18%;
   left: 50%;
   transform: translateX(-50%);
+  color: #8d8a8a;
 }
 
 .pagination li {
@@ -178,4 +179,40 @@ button{
 .pagination li.active {
   color: red;
   font-weight: bold;
+}
+
+#setUser{
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 76%;
+  background-color: white;
+  float: left;
+  text-align: left;
+  align-items: normal;
+  border: 1em solid transparent;
+  border-image: linear-gradient(to right, red, blue) 1;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0.1em 0.1em 2em 1.6em #1d1919;
+}
+#setUser > img{
+  width: 5%;
+  height: auto;
+  float: right;
+  margin: 2%;
+}
+
+#setUser input{
+  margin-bottom: 5%;
+  width: 90%;
+  height: 2rem;
+  align-items: center;
+  border-radius: 2rem;
+  border-style: solid;
+  border-color: #a4a4a4;
 }

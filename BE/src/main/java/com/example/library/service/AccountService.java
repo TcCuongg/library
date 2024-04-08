@@ -6,6 +6,7 @@ import com.example.library.entity.MainContent;
 import com.example.library.entity.Notification;
 import com.example.library.RedisObject.AccountRedis;
 import com.example.library.more.Mess;
+import com.example.library.more.SetUser;
 import com.example.library.repository.AccountRepository;
 import com.example.library.repository.MainContentRepository;
 import com.example.library.repository.NotificationRepository;
@@ -183,22 +184,7 @@ public class AccountService {
         }
     }
     public Account getByEmailAndPassword(String email, String password){
-        String redisKey = "getByEmailAndPassword:" + email;
-
-        boolean hasKey = redisAccountRedisTemplate.hasKey(redisKey);
-        if(hasKey){
-            AccountRedis accountRedis = (AccountRedis) redisAccountRedisTemplate.opsForValue().get(redisKey);
-            Account account = new Account(accountRedis);
-            return account;
-        }
-        else {
-            Account account = accountRepository.findByEmailAndPassword(email, password);
-            if(account != null){
-                AccountRedis accountRedis = new AccountRedis(account);
-                redisAccountRedisTemplate.opsForValue().set(redisKey, accountRedis);
-            }
-            return account;
-        }
+        return accountRepository.findByEmailAndPassword(email, password);
     }
     public List<Mess> findAllMess(int count, int size){
         Pageable pageable = PageRequest.of(count, size);
@@ -395,35 +381,39 @@ public class AccountService {
     public List<Account> addAccount(String username, String email, String phone, String address, String password, String type) {
         Account account = new Account();
         List<Account> accounts = new ArrayList<>();
-        if(accountRepository.findAllByEmail(email).isEmpty() && accountRepository.findAllByPhone(Long.parseLong(phone)).isEmpty()){
-            account.setName(username);
-            account.setEmail(email);
-            account.setAddress(address);
-            account.setPassword(sha256(password));
-            account.setPhone(Long.parseLong(phone));
-            account.setAvatar("root");
-            account.setLevel(10);
-            account.setStatus("opend");
-            account.setType(type);
+        if(username != "" && email != "" && phone != "" && address != "" && password != "" && type != ""){
+            if(accountRepository.findAllByEmail(email).isEmpty() && accountRepository.findAllByPhone(Long.parseLong(phone)).isEmpty()){
+                account.setName(username);
+                account.setEmail(email);
+                account.setAddress(address);
+                account.setPassword(sha256(password));
+                account.setPhone(Long.parseLong(phone));
+                account.setAvatar("root");
+                account.setLevel(10);
+                account.setStatus("opend");
+                account.setType(type);
 
-            account.setTimeCreate(LocalDateTime.now());
-            accountRepository.save(account);
+                account.setTimeCreate(LocalDateTime.now());
+                accountRepository.save(account);
 
-            accounts.add(accountRepository.findFirstByOrderByCardNumberDesc());
+                accounts.add(accountRepository.findFirstByOrderByCardNumberDesc());
 
-            redisAccountRedisTemplate.delete("getAllAccount(" + accountRepository.getCountAllAccount()/11 + ", " + 11 + ")");
+                redisAccountRedisTemplate.delete("getAllAccount(" + accountRepository.getCountAllAccount()/11 + ", " + 11 + ")");
 
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+address+"(*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+email+"(*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+username+"(*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:opend(*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:10(*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+phone+"(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+address+"(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+email+"(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+username+"(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:opend(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:10(*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllAccountByRequest:"+phone+"(*"));
 
-            redisAccountRedisTemplate.delete("findAllMess(" + accountRepository.findCountAllMess()/11 + ", " + 11 + ")");
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAccountByTimeCreate:*"));
-            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
+                redisAccountRedisTemplate.delete("findAllMess(" + accountRepository.findCountAllMess()/11 + ", " + 11 + ")");
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAccountByTimeCreate:*"));
+                redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
+                return accounts;
+            }
+            return accounts;
         }
         return accounts;
     }
@@ -465,32 +455,35 @@ public class AccountService {
 
         return getAllAccount(count, size);
     }
-    public List<Mess> addNewMess(String title, String content, int count, int size){
-        int findCountAllMess = accountRepository.findCountAllMess()/11;
-        MainContent mainContent = new MainContent();
-        List<Account> accountList = accountRepository.findAllAccount();
-        mainContent.setType(title);
-        mainContent.setContent(content);
-        mainContentRepository.save(mainContent);
-        List<Notification> notificationList = new ArrayList<>();
-        mainContent = mainContentRepository.findFirstByOrderByIdDesc();
-        for(int i = 0; i < accountList.size(); i++){
-            Notification notification = new Notification();
-            notification.setSent(LocalDateTime.now());
-            notification.setAccountToNotification(accountList.get(i));
-            notification.setMainContentToNotification(mainContent);
-            notificationList.add(notification);
-            notificationRepository.save(notification);
-            accountList.get(i).getNotificationsFromAccount().add(notification);
-            accountList.get(i).setNotificationsFromAccount(accountList.get(i).getNotificationsFromAccount());
+    public int addNewMess(String title, String content){
+        if(title != "" && content != ""){
+            int findCountAllMess = accountRepository.findCountAllMess()/11;
+            MainContent mainContent = new MainContent();
+            List<Account> accountList = accountRepository.findAllAccount();
+            mainContent.setType(title);
+            mainContent.setContent(content);
+            mainContentRepository.save(mainContent);
+            List<Notification> notificationList = new ArrayList<>();
+            mainContent = mainContentRepository.findFirstByOrderByIdDesc();
+            for(int i = 0; i < accountList.size(); i++){
+                Notification notification = new Notification();
+                notification.setSent(LocalDateTime.now());
+                notification.setAccountToNotification(accountList.get(i));
+                notification.setMainContentToNotification(mainContent);
+                notificationList.add(notification);
+                notificationRepository.save(notification);
+                accountList.get(i).getNotificationsFromAccount().add(notification);
+                accountList.get(i).setNotificationsFromAccount(accountList.get(i).getNotificationsFromAccount());
+            }
+            mainContent.setNotificationsFromMainContent(notificationList);
+            mainContentRepository.save(mainContent);
+            redisAccountRedisTemplate.delete("findAllMess(" + findCountAllMess + ", " + 11 + ")");
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
+            redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
+            accountRepository.saveAll(accountList);
+            return accountList.size();
         }
-        mainContent.setNotificationsFromMainContent(notificationList);
-        mainContentRepository.save(mainContent);
-        redisAccountRedisTemplate.delete("findAllMess(" + findCountAllMess + ", " + 11 + ")");
-        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findAllMessByRequest: *"));
-        redisAccountRedisTemplate.delete(redisAccountRedisTemplate.keys("findMessByTimeSent:*"));
-        accountRepository.saveAll(accountList);
-        return findAllMess(count, size);
+        return 0;
     }
 
 
@@ -513,6 +506,57 @@ public class AccountService {
         }
         if(Objects.equals(status, "")) status = null;
         return accountRepository.getCountSelectAccount(LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd), status);
+    }
+    public int getCountAllMess(){
+        return accountRepository.getCountAllMess();
+    }
+    public int getCountAllMessBySent(String timeStart, String timeEnd){
+        if(timeStart == "") timeStart = LocalDateTime.MIN.toString();
+        else if(!timeStart.contains("T") && !timeStart.contains(" ")){
+            timeStart += "T00:00:00";
+        } else{
+            timeStart = timeStart.replace(" ", "T");
+        }
+        if(timeEnd == "") timeEnd = "9999-12-31T23:59:59";
+        else if(!timeEnd.contains("T") && !timeEnd.contains(" ")){
+            timeEnd += "T00:00:00";
+        } else{
+            timeEnd = timeEnd.replace(" ", "T");
+        }
+        return accountRepository.getCountAllMessBySent(LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd));
+    }
+
+    public int getCountAllMessByRequest(String request){
+        if(accountRepository.getCountAllMessByEmail(request) > 0){
+            return accountRepository.getCountAllMessByEmail(request);
+        }
+        if(accountRepository.getCountAllMessByContent(request) > 0){
+            return accountRepository.getCountAllMessByContent(request);
+        }
+        else{
+            return accountRepository.getCountAllMessByType(request);
+        }
+    }
+    public Account setUser(SetUser setUser){
+        if(setUser.getPassOld() != "" && setUser.getPassNew() != ""){
+            Account account = accountRepository.findByEmailAndPassword(setUser.getUserEmail(), setUser.getPassOld());
+            if(account != null){
+                account.setName(setUser.getUserName());
+                account.setEmail(setUser.getUserEmail());
+                account.setPhone(Long.parseLong(setUser.getUserPhone()));
+                account.setAddress(setUser.getUserAddress());
+                account.setPassword(sha256(setUser.getPassNew()));
+                return accountRepository.save(account);
+            }else return new Account();
+        }
+        else {
+            Account account = accountRepository.findFirstByCardNumber(setUser.getUserId());
+            account.setName(setUser.getUserName());
+            account.setEmail(setUser.getUserEmail());
+            account.setPhone(Long.parseLong(setUser.getUserPhone()));
+            account.setAddress(setUser.getUserAddress());
+            return accountRepository.save(account);
+        }
     }
 
 

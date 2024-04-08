@@ -3,6 +3,7 @@ package com.example.library.service;
 import com.example.library.entity.Account;
 import com.example.library.entity.BookStorage;
 import com.example.library.entity.Cart;
+import com.example.library.more.CartSave;
 import com.example.library.repository.AccountRepository;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.BookStorageRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,24 +28,19 @@ public class CartService {
     @Autowired
     private RedisTemplate redisCartTemplate;
 
-    public Cart addNewCart(Long bookStorageId, Long accountId){
+    public List<CartSave> addNewCart(Long bookStorageId, Long accountId){
         int getCountAllBookByAccountCart = bookRepository.getCountAllBookByAccountCart(accountId);
+        List<CartSave> cartList = new ArrayList<>();
         Cart cart = new Cart();
         Account account = accountRepository.findFirstByCardNumber(accountId);
         BookStorage bookStorage = bookStorageRepository.findFirstById(bookStorageId);
         cart.setAccountToCart(account);
         cart.setBookStorageToCart(bookStorage);
 
-        account.getCartsFromAccount().add(cart);
-        account.setCartsFromAccount(account.getCartsFromAccount());
-        accountRepository.save(account);
-
-        bookStorage.getCartsFromBookStorage().add(cart);
-        bookStorage.setCartsFromBookStorage(bookStorage.getCartsFromBookStorage());
-        bookStorageRepository.save(bookStorage);
-
         redisCartTemplate.delete("findAllBookByAccountCart:" + accountId +"(" + getCountAllBookByAccountCart/8 + ", " + 8 + ")");
 
-        return cartRepository.save(cart);
+        cartRepository.save(cart);
+        cartList.add(new CartSave(bookStorageId, accountId));
+        return cartList;
     }
 }

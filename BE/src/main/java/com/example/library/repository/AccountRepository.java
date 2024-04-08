@@ -84,6 +84,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " notification.mainContentToNotification.id = mainContent.id")
     public List<Mess> findAllMess(Pageable pageable);
 
+    @Query("select count(account.cardNumber)" +
+            " from Account account inner join account.notificationsFromAccount notification" +
+            " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
+            " notification.mainContentToNotification.id = mainContent.id")
+    public int getCountAllMess();
+
     @Query("select count(account) from Account account inner join account.notificationsFromAccount notification" +
             " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
             " notification.mainContentToNotification.id = mainContent.id")
@@ -96,12 +102,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " where account.email = :email")
     public List<Mess> findAllMessByEmail(@Param("email") String email, Pageable pageable);
 
-    @Query("select count(account)" +
+    @Query("select count(account.cardNumber)" +
             " from Account account inner join account.notificationsFromAccount notification" +
             " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
             " notification.mainContentToNotification.id = mainContent.id" +
             " where account.email = :email")
-    public int findCountAllMessByEmail(@Param("email") String email);
+    public int getCountAllMessByEmail(@Param("email") String email);
 
     @Query("select new com.example.library.more.Mess(mainContent.type, mainContent.content, notification.sent, account.email)" +
             " from Account account inner join account.notificationsFromAccount notification" +
@@ -110,12 +116,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " where mainContent.type = :type")
     public List<Mess> findAllMessByType(@Param("type") String type, Pageable pageable);
 
-    @Query("select count(account)" +
+    @Query("select count(account.cardNumber)" +
             " from Account account inner join account.notificationsFromAccount notification" +
             " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
             " notification.mainContentToNotification.id = mainContent.id" +
             " where mainContent.type = :type")
-    public int findCountAllMessByType(@Param("type") String type);
+    public int getCountAllMessByType(@Param("type") String type);
 
     @Query("select new com.example.library.more.Mess(mainContent.type, mainContent.content, notification.sent, account.email)" +
             " from Account account inner join account.notificationsFromAccount notification" +
@@ -124,12 +130,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " where mainContent.content = :content")
     public List<Mess> findAllMessByContent(@Param("content") String content, Pageable pageable);
 
-    @Query("select count(account)" +
+    @Query("select count(account.cardNumber)" +
             " from Account account inner join account.notificationsFromAccount notification" +
             " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
             " notification.mainContentToNotification.id = mainContent.id" +
             " where mainContent.content = :content")
-    public int findCountAllMessByContent(@Param("content") String content);
+    public int getCountAllMessByContent(@Param("content") String content);
 
     @Query("select new com.example.library.more.Mess(mainContent.type, mainContent.content, notification.sent, account.email)" +
             " from Account account inner join account.notificationsFromAccount notification" +
@@ -138,11 +144,11 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     public List<Mess> findAllMessBySent(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd,
                                         Pageable pageable);
 
-    @Query("select count(account)" +
+    @Query("select count(account.cardNumber)" +
             " from Account account inner join account.notificationsFromAccount notification" +
             " on account.cardNumber = notification.accountToNotification.cardNumber inner join notification.mainContentToNotification mainContent on" +
             " notification.mainContentToNotification.id = mainContent.id where notification.sent >= :timeStart and notification.sent <= :timeEnd")
-    public int findCountAllMessBySent(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd);
+    public int getCountAllMessBySent(@Param("timeStart") LocalDateTime timeStart, @Param("timeEnd") LocalDateTime timeEnd);
 
     @Query("select account from Account account")
     public List<Account> findAllAccount();

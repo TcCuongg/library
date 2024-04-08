@@ -4,7 +4,9 @@
   <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
   <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
   <a><h3 style="color: red;" (click)="clickManageStyle()">Quản lý thể loại</h3></a><br>
-  <a><h3>Quản lý doanh thu</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageAuthor'"><h3>Quản lý tác giả</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/managePay'"><h3>Quản lý đơn hàng</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageTurnover'"><h3>Quản lý doanh thu</h3></a><br>
 </div>
 <div id="body">
   <div id = "Head">
@@ -17,7 +19,7 @@
       <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
       <button style="color: #d35810; float: right" *ngIf="admin" (click)="clickUser()"><h2>{{admin.name}}</h2></button>
       <div style="width: 12%; height: auto; position: absolute; top: 90%; right: 0; transform: translateY(-10%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 10;" [ngStyle]="changeLogout()">
-        <div id = "setting">Cài đặt</div><br>
+        <div id = "setting" (click)="isSetUser = true; clickUser()">Cài đặt</div><br>
         <div id = "logout" [ngStyle]="changeLogout()" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
       </div>
     </div>
@@ -41,12 +43,13 @@
       <button style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #ED2874; color: white">Thêm</button>
     </div>
     <ul class="pagination">
-      <li (click)="selectPage(1)"  [class.active]="count === 0">Trang đầu</li>
+      <li (click)="selectPage(1)"  [class.active]="count === 0"><<</li>
       <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
         {{ page }}
       </li>
       <li *ngIf="count < totalPages - 3">...</li>
-      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{ totalPages }}</li>
+      <li (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{totalPages}}</li>
+      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">>></li>
     </ul>
   </div>
   <div id = "moreStorage" [ngStyle]="changeMoreStorage()">
@@ -62,6 +65,28 @@
     <div style="width: 36%; height: 14%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 9%">
       <button style="height: 100%; width: 46%; float: left; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="saveNewCategory(); clickMore()">Lưu</button>
       <button style="height: 100%; width: 46%; float: right; border-radius: 5rem; border-style: solid; border-color: #a4a4a4;" (click)="clickMore()">Bỏ</button>
+    </div>
+  </div>
+  <div id = "setUser" [ngStyle]="changeSetUser()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isSetUser = false">
+    <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tài khoản</h2>
+    <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 88%">
+      <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+      <input [(ngModel)]="userName" type="text" placeholder="{{admin?.name}}"><br>
+      <h3 style="margin-left: 5%">Email đăng nhập</h3>
+      <input [(ngModel)]="userEmail" type="text" placeholder="{{admin?.email}}"><br>
+      <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+      <input style="float: none" [(ngModel)]="userPhone" type="text" placeholder="{{admin?.phone}}"><br>
+      <h3 style="margin-left: 5%">Địa chỉ</h3>
+      <input [(ngModel)]="userAddress" type="text" placeholder="{{admin?.address}}"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu cũ</h3>
+      <input [(ngModel)]="passOld" type="text" placeholder="Mật khẩu cũ"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu mới</h3>
+      <input [(ngModel)]="passNew" type="text" placeholder="Mật khẩu mới">
+      <div style="width: 45%; height: 8%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 1%">
+        <button style="float: left; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="setUser()">Lưu</button>
+        <button style="float: right; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="clickSetting()">Bỏ</button>
+      </div>
     </div>
   </div>
   <div id = "Mess" [ngStyle]="changeMess()">

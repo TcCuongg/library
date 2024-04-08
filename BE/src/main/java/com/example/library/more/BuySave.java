@@ -13,10 +13,13 @@ public class BuySave {
     private Long accountId;
     private String status;
     private Long cost;
-    public BuySave(Long bookStorageId, Long accountId, String status, Long cost){
+    private int quantity;
+    public BuySave(){}
+    public BuySave(Long bookStorageId, Long accountId, String status, Long cost, int quantity){
         this.bookStorageId = bookStorageId;
         this.accountId = accountId;
         this.status = status;
         this.cost = cost;
+        this.quantity = quantity;
     }
 }

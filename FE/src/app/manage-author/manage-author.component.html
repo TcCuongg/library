@@ -1,1 +1,112 @@
-<p>manage-author works!</p>
+<div style="width: 16%; height: 100%; z-index: 100; background-color: #57445A; color: white; position: fixed; left: 0; top: 0; padding-top: 6%; text-align: center">
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageUser'"><h3>Quản lý tài khoản</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageBook'"><h3>Quản lý sách</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageStorage'"><h3>Quản lý kho</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageMess'"><h3>Quản lý thông báo</h3></a><br>
+  <a><h3 style="color: white;" [routerLink]="'/manageStyle'">Quản lý thể loại</h3></a><br>
+  <a style="color: red; text-decoration: none" [routerLink]="'/manageAuthor'"><h3>Quản lý tác giả</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/managePay'"><h3>Quản lý đơn hàng</h3></a><br>
+  <a style="color: white; text-decoration: none" [routerLink]="'/manageTurnover'"><h3>Quản lý doanh thu</h3></a><br>
+</div>
+<div id = "body">
+  <div id = "Head">
+    <div id = "name">
+      <p style="color: #F78DA7; width: auto;">TCC</p>
+      <p style="color: #999; width: auto;">Chỉ cần bạn cần chúng tôi có</p>
+    </div>
+    <div id = "categori">
+      <input [(ngModel)]="inputValue" type="text" placeholder="Tìm kiếm tác giả">
+      <img alt="error" src="assets/icon/Search.svg" style="margin-right: 1%;" (click)="clickSearch()">
+      <button style="color: #d35810; float: right" *ngIf="admin" (click)="clickUser()"><h2>{{admin.name}}</h2></button>
+      <div style="width: 12%; height: auto; position: absolute; top: 100%; right: 0; transform: translateY(-14%); background-color: #ED2874FF; text-align: center; padding: 1rem; z-index: 2;" [ngStyle]="changeLogout()">
+        <div id = "setting" (click)="isSetUser = true; clickUser()">Cài đặt</div><br>
+        <div id = "logout" (click)="clickLogout()" [routerLink]="'/bookStore'">Đăng xuất</div>
+      </div>
+    </div>
+  </div>
+  <div id = "select">
+    <h3>Ngày sinh: </h3>
+    <input [(ngModel)]="timeStart" style="left: 30%; transform: translate(-70%, -50%)" type="text" placeholder="Bắt đầu">
+    <input [(ngModel)]="timeEnd" style="left: 55%; transform: translate(-45%, -50%)" type="text" placeholder="Kết thúc">
+    <div id = "button">
+      <button style="color: white; background-color: #ED2874; float: left; width: 45%; height: 100%" (click)="clickSelect()">Tìm kiếm</button>
+      <button style="color: white; background-color: #ED2874; float: right; width: 45%; height: 100%" (click)="isBoxInput = true; isSettingAuthor = false; isNewAuthor = true">Thêm mới</button>
+    </div>
+  </div>
+  <div id = "nav">
+    <table>
+      <tr>
+        <th>Tên tác giả</th>
+        <th>Số điện thoại</th>
+        <th>Ngày sinh</th>
+        <th>Địa chỉ</th>
+        <th>Cài đặt</th>
+      </tr>
+      <tr *ngFor="let item of datasAuthor">
+        <td style="width: 16%">{{item.name}}</td>
+        <td style="width: 16%">{{item.phone}}</td>
+        <td style="width: 18%">{{item.date}}</td>
+        <td style="width: 44%">{{item.address}}</td>
+        <td style="background-color: #2884ea; width: 6%">
+          <button style="width: 100%; height: 100%; padding: 11% 8.5%; color: white; background-color: #2884ea" (click)="clickSetting(item); isBoxInput = true; isSettingAuthor = true; isNewAuthor = false">Sửa</button>
+        </td>
+      </tr>
+    </table>
+    <button style="color: #F78DA7; position: absolute; bottom: 2%; right: 0" (click)="clickMore()"><h3>Xem thêm ></h3></button>
+    <button style="color: #F78DA7; position: absolute; bottom: 2%; left: 0" (click)="clickLast()"><h3>< Quay lại</h3></button>
+    <ul class="pagination">
+      <li (click)="selectPage(1)"  [class.active]="count === 0"><<</li>
+      <li *ngFor="let page of getVisiblePages()" [class.active]="page === count + 1" (click)="selectPage(page)">
+        {{ page }}
+      </li>
+      <li *ngIf="count < totalPages - 3">...</li>
+      <li (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">{{totalPages}}</li>
+      <li style="margin-right: 0" (click)="selectPage(totalPages)"  [class.active]="totalPages === count + 1">>></li>
+    </ul>
+  </div>
+  <div id = "newAuthor" [ngStyle]="changeBoxInput()">
+    <img style="width: 6%; transform: rotate(90deg); float: right" alt="error" src="assets/icon/close.svg" (click)="closeBoxInput()">
+    <h2 [ngStyle]="{'display': isNewAuthor ? 'block':'none'}" style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Thêm mới tác giả</h2>
+    <h2 [ngStyle]="{'display': isSettingAuthor ? 'block':'none'}" style="float: left; margin-left: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tác giả</h2><br><br><br>
+    <h3>Tên tác giả</h3>
+    <input [(ngModel)]="inputName" type="text" placeholder="Tên tác giả">
+    <h3>Số điện thoại</h3>
+    <input [(ngModel)]="inputPhone" type="text" placeholder="SĐT">
+    <h3>Ngày sinh</h3>
+    <input [(ngModel)]="inputBirthDay" type="text" placeholder="Ngày sinh">
+    <h3>Địa chỉ</h3>
+    <input [(ngModel)]="inputAddress" type="text" placeholder="Địa chỉ">
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 10%; width: 40%; height: 8%">
+      <button style="color: white; background-color: #ED2874; float: left; width: 40%; height: 100%; border-radius: 0.4rem" [ngStyle]="{'display': isSettingAuthor ? 'block':'none'}" (click)="updateAuthor()">Lưu</button>
+      <button style="color: white; background-color: #ED2874; float: left; width: 40%; height: 100%; border-radius: 0.4rem" [ngStyle]="{'display': isNewAuthor ? 'block':'none'}" (click)="addNewAuthor()">Thêm</button>
+      <button style="color: white; background-color: #ED2874; float: right; width: 40%; height: 100%; border-radius: 0.4rem" (click)="closeBoxInput()">Bỏ</button>
+    </div>
+  </div>
+  <div id = "setUser" [ngStyle]="changeSetUser()">
+    <img alt="error" src="assets/icon/close.svg" (click)="isSetUser = false">
+    <h2 style="float: left; margin: 2%; text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem">Sửa thông tin tài khoản</h2>
+    <div style="margin-top: 10%; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 88%">
+      <h3 style="margin-left: 5%">Tên đăng nhập</h3>
+      <input [(ngModel)]="userName" type="text" placeholder="{{admin?.name}}"><br>
+      <h3 style="margin-left: 5%">Email đăng nhập</h3>
+      <input [(ngModel)]="userEmail" type="text" placeholder="{{admin?.email}}"><br>
+      <h3 style="margin-left: 5%">SĐT liên hệ</h3>
+      <input style="float: none" [(ngModel)]="userPhone" type="text" placeholder="{{admin?.phone}}"><br>
+      <h3 style="margin-left: 5%">Địa chỉ</h3>
+      <input [(ngModel)]="userAddress" type="text" placeholder="{{admin?.address}}"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu cũ</h3>
+      <input [(ngModel)]="passOld" type="text" placeholder="Mật khẩu cũ"><br><br><br>
+      <h3 style="margin-left: 5%;">Mật khẩu mới</h3>
+      <input [(ngModel)]="passNew" type="text" placeholder="Mật khẩu mới">
+      <div style="width: 45%; height: 8%; position: absolute; left: 50%; transform: translateX(-50%); bottom: 1%">
+        <button style="float: left; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="setUser()">Lưu</button>
+        <button style="float: right; width: 34%; height: 100%; border-radius: 1rem; background-color: #ED2874FF; color: white" (click)="clickSettingUser()">Bỏ</button>
+      </div>
+    </div>
+  </div>
+  <div id = "Mess" [ngStyle]="changeMess()">
+    <img alt="error" src="assets/icon/close.svg" (click)="clickCloseMess()">
+    <h2 style="text-decoration: underline; text-decoration-color: #ED2874; text-underline-offset: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); top: 6%">Thông báo</h2>
+    <h3 style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -45%); text-align: center">{{mess}}</h3>
+  </div>
+</div>

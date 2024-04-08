@@ -3,8 +3,10 @@ package com.example.library.service;
 import com.example.library.RedisObject.AccountRedis;
 import com.example.library.RedisObject.BookMoreRedis;
 import com.example.library.entity.*;
+import com.example.library.more.AuthorBookId;
 import com.example.library.more.BookManage;
 import com.example.library.more.BookMore;
+import com.example.library.more.BookPay;
 import com.example.library.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -15,10 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class BookService {
@@ -36,6 +35,8 @@ public class BookService {
     private RedisTemplate redisBookManageTemplate;
     @Autowired
     private RedisTemplate redisStringTemplate;
+    @Autowired
+    private BookStorageRepository bookStorageRepository;
 
 
     public List<BookMore> getAllBook(int count, int size){
@@ -195,6 +196,21 @@ public class BookService {
             }
         }
         return booklist;
+//        return bookRepository.getBookByStorageId(storageId, pageable);
+    }
+
+    public List<BookMore> getBookByStorageIdAndCategory(Long storageId, String category, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        List<BookMore> booklist = new ArrayList<>();
+        booklist = bookRepository.getBookByStorageIdAndCategory(storageId, category, pageable);
+        Collections.reverse(booklist);
+        return booklist;
+    }
+
+    public List<BookMore> getBookByBookStorageOnStorage(Long bookStorageId, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        Storage storage = bookStorageRepository.findFirstById(bookStorageId).getStorageToBookStorage();
+        return bookRepository.getBookByStorageId(storage.getId(), pageable);
 //        return bookRepository.getBookByStorageId(storageId, pageable);
     }
 
@@ -415,6 +431,19 @@ public class BookService {
 //        return bookRepository.getAllBookByAccountBuy(accountId, pageable);
     }
 
+    public List<BookMore> getAllBookByAccountBuyNew(Long accountId, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getAllBookByAccountBuyNew(accountId, pageable);
+    }
+    public List<BookMore> getAllBookByAccountBuyDelivered(Long accountId, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getAllBookByAccountBuyDelivered(accountId, pageable);
+    }
+    public List<BookMore> getAllBookByAccountBuyDelivering(Long accountId, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getAllBookByAccountBuyDelivering(accountId, pageable);
+    }
+
 
     public List<BookManage> findAllBookManage(int count, int size){
         Pageable pageable = PageRequest.of(count, size);
@@ -614,13 +643,150 @@ public class BookService {
 //        return bookRepository.findAllStatus();
     }
 
+    public List<BookPay> getAllBookPay(int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getAllBookPay(pageable);
+    }
+    public List<BookPay> getBookPayByDelivering(int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getBookPayByDelivering(pageable);
+    }
+    public List<BookPay> getBookPayByBom(int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getBookPayByBom(pageable);
+    }
+    public List<BookPay> getBookPayByDelivered(int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        return bookRepository.getBookPayByDelivered(pageable);
+    }
+    public int getCountBookPayByDelivered(){
+        return bookRepository.getCountBookPayByDelivered();
+    }
+    public List<BookPay> getBookPayByDeliveredRequest(String request, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        if(!bookRepository.getBookPayByDeliveredByUserEmail(request, pageable).isEmpty()){
+            return bookRepository.getBookPayByDeliveredByUserEmail(request, pageable);
+        }else if(!bookRepository.getBookPayByDeliveredByUserName(request, pageable).isEmpty()){
+            return bookRepository.getBookPayByDeliveredByUserName(request, pageable);
+        }else return bookRepository.getBookPayByDeliveredByUserPhone(Long.parseLong(request), pageable);
+    }
+    public int getCountBookPayByDeliveredRequest(String request){
+        if(bookRepository.getCountBookPayByDeliveredByUserEmail(request) > 0){
+            return bookRepository.getCountBookPayByDeliveredByUserEmail(request);
+        }else if(bookRepository.getCountBookPayByDeliveredByUserName(request) > 0){
+            return bookRepository.getCountBookPayByDeliveredByUserName(request);
+        }else return bookRepository.getCountBookPayByDeliveredByUserPhone(Long.parseLong(request));
+    }
+
+
+    public List<BookPay> getBookPayByRequest(String request, int option, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        if(option == 0){
+            if(!bookRepository.getBookPayByUserEmail(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByUserEmail(request, pageable);
+            }
+            else if(!bookRepository.getBookPayByUserName(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByUserName(request, pageable);
+            }else return bookRepository.getBookPayByUserPhone(Long.parseLong(request), pageable);
+        }
+        else if(option == 1){
+            if(!bookRepository.getBookPayByDeliveringByUserEmail(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByDeliveringByUserEmail(request, pageable);
+            }
+            else if(!bookRepository.getBookPayByDeliveringByUserName(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByDeliveringByUserName(request, pageable);
+            }else return bookRepository.getBookPayByDeliveringByUserPhone(Long.parseLong(request), pageable);
+        }
+        else {
+            if(!bookRepository.getBookPayByBomByUserEmail(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByBomByUserEmail(request, pageable);
+            }
+            else if(!bookRepository.getBookPayByBomByUserName(request, pageable).isEmpty()){
+                return bookRepository.getBookPayByBomByUserName(request, pageable);
+            }else return bookRepository.getBookPayByBomByUserPhone(Long.parseLong(request), pageable);
+        }
+    }
+
+    public int getCountBookPayByRequest(String request, int option){
+        if(option == 0){
+            if(bookRepository.getCountBookPayByUserEmail(request) > 0){
+                return bookRepository.getCountBookPayByUserEmail(request);
+            }
+            else if(bookRepository.getCountBookPayByUserName(request) > 0){
+                return bookRepository.getCountBookPayByUserName(request);
+            }else return bookRepository.getCountBookPayByUserPhone(Long.parseLong(request));
+        }
+        else if(option == 1){
+            if(bookRepository.getCountBookPayByDeliveringByUserEmail(request) > 0){
+                return bookRepository.getCountBookPayByDeliveringByUserEmail(request);
+            }
+            else if(bookRepository.getCountBookPayByDeliveringByUserName(request) > 0){
+                return bookRepository.getCountBookPayByDeliveringByUserName(request);
+            }else return bookRepository.getCountBookPayByDeliveringByUserPhone(Long.parseLong(request));
+        }
+        else {
+            if(bookRepository.getCountBookPayByBomByUserEmail(request) > 0){
+                return bookRepository.getCountBookPayByBomByUserEmail(request);
+            }
+            else if(bookRepository.getCountBookPayByBomByUserName(request) > 0){
+                return bookRepository.getCountBookPayByBomByUserName(request);
+            }else return bookRepository.getCountBookPayByBomByUserPhone(Long.parseLong(request));
+        }
+    }
+
+    public List<BookPay> selectionBookPayByTurnover(String name, String timeStart, String timeEnd, int count, int size){
+        Pageable pageable = PageRequest.of(count, size);
+        if(Objects.equals(timeStart, "")) timeStart = LocalDateTime.MIN.toString();
+        else if(!timeStart.contains("T") && !timeStart.contains(" ")){
+            timeStart += "T00:00:00";
+        } else{
+            timeStart = timeStart.replace(" ", "T");
+        }
+        if(Objects.equals(timeEnd, "")) timeEnd = "9999-12-31T23:59:59";
+        else if(!timeEnd.contains("T") && !timeEnd.contains(" ")){
+            timeEnd += "T00:00:00";
+        } else{
+            timeEnd = timeEnd.replace(" ", "T");
+        }if(name == "") name = null;
+        return bookRepository.selectionBookPayByTurnover(name, LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd), pageable);
+    }
+    public Long sumBookPayByTurnover(String name, String timeStart, String timeEnd){
+        if(Objects.equals(timeStart, "")) timeStart = LocalDateTime.MIN.toString();
+        else if(!timeStart.contains("T") && !timeStart.contains(" ")){
+            timeStart += "T00:00:00";
+        } else{
+            timeStart = timeStart.replace(" ", "T");
+        }
+        if(Objects.equals(timeEnd, "")) timeEnd = "9999-12-31T23:59:59";
+        else if(!timeEnd.contains("T") && !timeEnd.contains(" ")){
+            timeEnd += "T00:00:00";
+        } else{
+            timeEnd = timeEnd.replace(" ", "T");
+        }if(name == "") name = null;
+        return bookRepository.sumBookPayByTurnover(name, LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd));
+    }
+
+    public int countSelectionBookPayByTurnover(String name, String timeStart, String timeEnd){
+        if(Objects.equals(timeStart, "")) timeStart = LocalDateTime.MIN.toString();
+        else if(!timeStart.contains("T") && !timeStart.contains(" ")){
+            timeStart += "T00:00:00";
+        } else{
+            timeStart = timeStart.replace(" ", "T");
+        }
+        if(Objects.equals(timeEnd, "")) timeEnd = "9999-12-31T23:59:59";
+        else if(!timeEnd.contains("T") && !timeEnd.contains(" ")){
+            timeEnd += "T00:00:00";
+        } else{
+            timeEnd = timeEnd.replace(" ", "T");
+        }if(name == "") name = null;
+        return bookRepository.countSelectionBookPayByTurnover(name, LocalDateTime.parse(timeStart), LocalDateTime.parse(timeEnd));
+    }
 
 
 
 
     public BookManage addNewBook(String title, String category, String author, String content, String cost, String sale, String status){
         Book book = new Book();
-        AuthorBook authorBook = new AuthorBook();
         if(categoryRepository.findFirstByName(category) != null && authorRepository.findFirstByName(author) != null && title != "" && content != "" && cost != "" && sale != "" && status != ""){
             Category category1 = categoryRepository.findFirstByName(category);
             Author author1 = authorRepository.findFirstByName(author);
@@ -636,27 +802,15 @@ public class BookService {
             bookRepository.save(book);
             book = bookRepository.findFirstByOrderByIdDesc();
 
-            authorBook.setBookToAuthorBook(book);
-            authorBook.setAuthorToAuthorBook(author1);
+            AuthorBookId authorBookId = new AuthorBookId();
+            authorBookId.setAuthorId(book.getId());
+            authorBookId.setBookId(author1.getId());
+            AuthorBook authorBook = new AuthorBook(authorBookId, book, author1);
             authorBookRepository.save(authorBook);
 
             author1.getAuthorBooksFromAuthor().add(authorBook);
             author1.setAuthorBooksFromAuthor(author1.getAuthorBooksFromAuthor());
             authorRepository.save(author1);
-//            redisBookManageTemplate.delete("getAllBook(" + (bookRepository.getCountAllBook() - 11) + ", " + 11 + ")");
-//            redisBookManageTemplate.delete("getBookFollowDesc(" + bookRepository.getCountAllBook()/11 + ", " + 11 + ")");
-//            redisBookManageTemplate.delete("getBookByTitle:" + title + "(" + getCountBookByTitle/8 + ", " + 8 + ")");
-//            redisBookManageTemplate.delete("getBookByCategory:" + category +"(" + getCountBookByCategory/8 + ", " + 8 + ")");
-//            redisBookManageTemplate.delete("findAllBookManage(" + getCountAllBookManage/11 + ", " + 11 + ")");
-//            redisBookManageTemplate.delete("selectBook:" + category + "  " + author + "  *  *  " + status + "(" + countSelectBook/11 + ", " + 11 + ")");
-//
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + category +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + author +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + content +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + status +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + title +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + sale +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + cost +"(*");
 
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + category +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + author +"(*"));
@@ -664,6 +818,8 @@ public class BookService {
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + title +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + sale +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + cost +"(*"));
+
+            redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManage(*"));
         }
         return bookRepository.getBookManageByBookId(book.getId());
     }
@@ -672,8 +828,18 @@ public class BookService {
         List<BookManage> bookManageList = new ArrayList<>();
         if(categoryRepository.findFirstByName(categoryName) != null && authorRepository.findFirstByName(authorName) != null && title != "" &&categoryName != ""
                 && authorName != "" && content != "" && status != "" && cost.toString() != "" && String.valueOf(sale) != ""){
-            AuthorBook authorBook = authorBookRepository.findAuthorBookByAuthorIdAndBookId(authorId, bookId);
+            AuthorBookId authorBookId = new AuthorBookId();
+            authorBookId.setAuthorId(authorId);
+            authorBookId.setBookId(bookId);
+            Optional<AuthorBook> existingEntity = authorBookRepository.findById(authorBookId);
+            AuthorBook authorBook = existingEntity.get();
+            authorBookRepository.delete(authorBook);
+            authorBook = new AuthorBook();
+            authorBook.setBookToAuthorBook(bookRepository.findFirstById(bookId));
+            authorBookId.setAuthorId(authorRepository.findFirstByName(authorName).getId());
+            authorBook.setId(authorBookId);
             authorBook.setAuthorToAuthorBook(authorRepository.findFirstByName(authorName));
+            authorBookRepository.save(authorBook);
             Book book = bookRepository.findFirstById(bookId);
             book.setCategoryToBook(categoryRepository.findFirstByName(categoryName));
             book.setTitle(title);
@@ -682,20 +848,6 @@ public class BookService {
             book.setSale(sale);
             book.setStatus(status);
             bookRepository.save(book);
-//            redisBookManageTemplate.delete("getAllBook(*");
-//            redisBookManageTemplate.delete("getBookFollowDesc(*");
-//            redisBookManageTemplate.delete("getBookByTitle:" + title + "(*");
-//            redisBookManageTemplate.delete("getBookByCategory:" + categoryName +"(*");
-//            redisBookManageTemplate.delete("findAllBookManage(*");
-//            redisBookManageTemplate.delete("selectBook:" + categoryName + "  " + authorName + "  *  *  " + status + "(*");
-//
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + categoryName +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + authorName +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + content +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + status +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + title +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + sale +"(*");
-//            redisBookManageTemplate.delete("findAllBookByRequest:" + cost +"(*");
 
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + categoryName +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + authorName +"(*"));
@@ -703,6 +855,8 @@ public class BookService {
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + title +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + sale +"(*"));
             redisBookManageTemplate.delete(redisBookManageTemplate.keys("findAllBookManageRequest:" + cost +"(*"));
+
+            redisBookManageTemplate.delete(redisBookManageTemplate.keys("getBookByStorage:*"));
             redisBookManageTemplate.delete("findAllBookManage(" + count + ", " + size + ")");
             bookManageList.add(bookRepository.getBookManageByBookId(bookId));
             return bookManageList;
@@ -782,5 +936,41 @@ public class BookService {
     }
     public int getCountBookRemainsZero(Long storageId){
         return bookRepository.getCountBookRemainsZero(storageId);
+    }
+    public int getCountAllBookPay(){
+        return bookRepository.getCountAllBookPay();
+    }
+    public int getCountBookPayByDelivering(){
+        return bookRepository.getCountBookPayByDelivering();
+    }
+    public int getCountBookPayByBom(){
+        return bookRepository.getCountBookPayByBom();
+    }
+    public int getCountBookByStorageIdAndCategory(Long storageId, String category){
+        return bookRepository.getCountBookByStorageIdAndCategory(storageId, category);
+    }
+    public int getCountBookFollowDesc(){
+        return bookRepository.getCountBookFollowDesc();
+    }
+    public int getCountAllBook(){
+        return bookRepository.getCountAllBook();
+    }
+    public int getCountAllBookByAccountCart(Long accountId){
+        return bookRepository.getCountAllBookByAccountCart(accountId);
+    }
+    public int getCountAllBookByAccountBuyNew(Long accountId){
+        return bookRepository.getCountAllBookByAccountBuyNew(accountId);
+    }
+    public int getCountAllBookByAccountBuyDelivered(Long accountId){
+        return bookRepository.getCountAllBookByAccountBuyDelivered(accountId);
+    }
+    public int getCountAllBookByAccountBuyDelivering(Long accountId){
+        return bookRepository.getCountAllBookByAccountBuyDelivering(accountId);
+    }
+    public int getCountBookByCategory(String category){
+        return bookRepository.getCountBookByCategory(category);
+    }
+    public int getCountBookByTitle(String bookTitle){
+        return bookRepository.getCountBookByTitle(bookTitle);
     }
 }
